@@ -1,5 +1,5 @@
 import apiClient from './client';
-import type { LoginPayload, RegisterPayload, TokenResponse, User } from '../types';
+import type { LoginPayload, RegisterPayload, TokenResponse, User, ChangePasswordPayload} from '../types';
 
 export async function registerUser(payload: RegisterPayload) {
   const { data } = await apiClient.post<User>('/api/auth/register/', payload);
@@ -21,5 +21,11 @@ export async function refreshToken(refresh: string) {
 // Function to fetch the current user's profile
 export async function fetchCurrentUser() {
   const { data } = await apiClient.get<User>('/api/auth/me/');
+  return data;
+}
+
+
+export async function changePassword(payload: ChangePasswordPayload) {
+  const { data } = await apiClient.post<{ detail: string }>('/api/auth/change-password/', payload);
   return data;
 }

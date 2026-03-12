@@ -1,4 +1,8 @@
-import { Card, Descriptions, Typography } from 'antd';
+import { LockOutlined } from '@ant-design/icons';
+import { Button, Card, Space, Typography } from 'antd';
+import { useState } from 'react';
+import ChangePasswordModal from '../../components/profile/ChangePasswordModal';
+import ProfileSummaryCard from '../../components/profile/ProfileSummaryCard';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function ProfilePage() {
@@ -6,23 +10,45 @@ export default function ProfilePage() {
   // Get the user information from the AuthContext
   const { user } = useAuth();
 
+  // Control the password modal
+  const [passwordOpen, setPasswordOpen] = useState(false);
+
   return (
-    <Card>
-      {/* Title for the profile section */}
-      <Typography.Title level={3}>Profile</Typography.Title>
+    <Space direction="vertical" size="large" style={{ width: '100%' }}>
 
-      {/* Use Descriptions to display the user information in a bordered table */}
-      <Descriptions column={1} bordered>
+      {/* Profile section */}
+      <ProfileSummaryCard user={user} />
 
-        {/* username */}
-        <Descriptions.Item label="Username">{user?.username}</Descriptions.Item>
+      {/* Security section (Change password)*/}
+      <Card
+        title="Security"
+        extra={
+          <Button
+            type="primary"
+            icon={<LockOutlined />}
+            onClick={() => setPasswordOpen(true)}
+          >
+            Change Password
+          </Button>
+        }
+      >
 
-        {/* email */}
-        <Descriptions.Item label="Email">{user?.email || '-'}</Descriptions.Item>
+        {/* Title for the security section */}
+        <Typography.Paragraph style={{ marginBottom: 8 }}>
+          To keep your account secure, update your password regularly.
+        </Typography.Paragraph>
 
-        {/* role */}
-        <Descriptions.Item label="Role">{user?.role}</Descriptions.Item>
-      </Descriptions>
-    </Card>
+        {/* Tips for changing the password */}
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+          Click the button above to open the password change form.
+        </Typography.Paragraph>
+      </Card>
+
+      <ChangePasswordModal
+        open={passwordOpen}
+        onClose={() => setPasswordOpen(false)}
+      />
+
+    </Space>
   );
 }

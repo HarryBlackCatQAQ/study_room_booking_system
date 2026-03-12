@@ -17,6 +17,7 @@ class Review(models.Model):
     # The rating of the review (1-5) using a positive integer
     rating = models.PositiveIntegerField()
 
+    # The booking associated with the review
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, null=True, blank=True, related_name='review')
 
     # The comment associated with the review

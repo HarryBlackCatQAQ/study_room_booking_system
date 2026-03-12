@@ -1,6 +1,6 @@
 import { Button, DatePicker, Form, Modal, TimePicker, message } from 'antd';
 import dayjs from 'dayjs';
-import { createBooking } from '../api/bookings';
+import { createBooking } from '../../api/bookings';
 // import { useState } from 'react';
 
 // Props interface for the BookingModal component, defining the expected props and their types

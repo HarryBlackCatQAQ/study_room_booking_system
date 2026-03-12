@@ -28,5 +28,8 @@ class ReviewListCreateView(generics.ListCreateAPIView):
 
     # set the student field to the current user
     def perform_create(self, serializer):
+        # get the booking from the validated data
         booking = serializer.validated_data['booking']
+
+        # set the student field to the current user
         serializer.save(student=self.request.user, room=booking.room)

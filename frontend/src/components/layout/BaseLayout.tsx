@@ -34,13 +34,21 @@ export default function BaseLayout({items, defaultPath}: BaseLayoutProps) {
 
             {/* Render the sidebar and content */}
             <Layout>
-            {/* Render the sidebar with a breakpoint for responsiveness, and a menu with navigation items */}
-            <Layout.Sider breakpoint="lg" collapsedWidth="0" width={220} theme="light">
-                <Menu mode="inline" selectedKeys={[selected]} items={items} onClick={handleMenuClick} style={{ height: '100%', borderInlineEnd: 0 }} />
-            </Layout.Sider>
-            <Layout.Content style={{ padding: 24 }}>
-                <Outlet />
-            </Layout.Content>
+              {/* Render the sidebar with a breakpoint for responsiveness, and a menu with navigation items */}
+              <Layout.Sider breakpoint="lg" collapsedWidth="0" width={220} theme="light">
+                  <Menu
+                    mode="inline"
+                    selectedKeys={selected ? [selected] : []}
+                    items={items}
+                    onClick={handleMenuClick}
+                    style={{ height: '100%', borderInlineEnd: 0 }}
+                  />
+              </Layout.Sider>
+
+              
+              <Layout.Content style={{ padding: 24 }}>
+                  <Outlet />
+              </Layout.Content>
             </Layout>
 
         </Layout>
@@ -52,6 +60,11 @@ export default function BaseLayout({items, defaultPath}: BaseLayoutProps) {
 function getSelectedKey(location: any, items: NavigationItem[], defaultPath: string){
   // Get the current pathname from the location object
   const pathname = location.pathname;
+
+  // Keep defaultPath for the base route
+  if (pathname === defaultPath) {
+    return defaultPath;
+  }
 
   // First check whether the current route exactly matches a menu item
   for (const item of items) {
@@ -71,6 +84,6 @@ function getSelectedKey(location: any, items: NavigationItem[], defaultPath: str
     }
   }
 
-  // If a matching item is found, return its key; otherwise return the default path
-  return selectedKey || defaultPath;
+  // If no matching menu item is found, return an empty string
+  return selectedKey;
 }

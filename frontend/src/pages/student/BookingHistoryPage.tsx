@@ -5,7 +5,8 @@ import StatusTag from '../../components/StatusTag';
 import type { Booking } from '../../types';
 import { formatDate, formatTime } from '../../utils/format';
 import dayjs from 'dayjs';
-import ReviewModal from '../../components/ReviewModal';
+import ReviewModal from '../../components/review/ReviewModal';
+
 
 export default function BookingHistoryPage() {
   //  set  bookings, loading and reviewBooking state

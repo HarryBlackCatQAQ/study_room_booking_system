@@ -13,6 +13,7 @@ class UserAPITests(APITestCase):
         self.register_url = reverse(UsersRoutes.REGISTER_FULL_NAME)
         self.login_url = reverse(UsersRoutes.LOGIN_FULL_NAME)
         self.me_url = reverse(UsersRoutes.ME_FULL_NAME)
+        self.change_password_url = reverse(UsersRoutes.CHANGE_PASSWORD_FULL_NAME)
 
         self.user = User.objects.create_user(
             username="existing_user",
@@ -82,5 +83,61 @@ class UserAPITests(APITestCase):
 
     def test_me_fail_without_authentication(self):
         response = self.client.get(self.me_url)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_change_password_success(self):
+        self.client.force_authenticate(user=self.user)
+
+        payload = {
+            "current_password": "Test123456",
+            "new_password": "NewPass123",
+            "confirm_password": "NewPass123",
+        }
+
+        response = self.client.post(self.change_password_url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["detail"], "Password changed successfully.")
+
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("NewPass123"))
+
+    def test_change_password_fail_wrong_current_password(self):
+        self.client.force_authenticate(user=self.user)
+
+        payload = {
+            "current_password": "WrongPassword123",
+            "new_password": "NewPass123",
+            "confirm_password": "NewPass123",
+        }
+
+        response = self.client.post(self.change_password_url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "Current password is incorrect.")
+
+    def test_change_password_fail_mismatch_confirm_password(self):
+        self.client.force_authenticate(user=self.user)
+
+        payload = {
+            "current_password": "Test123456",
+            "new_password": "NewPass123",
+            "confirm_password": "AnotherPass123",
+        }
+
+        response = self.client.post(self.change_password_url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["detail"], "New password and confirm password do not match.")
+
+    def test_change_password_fail_without_authentication(self):
+        payload = {
+            "current_password": "Test123456",
+            "new_password": "NewPass123",
+            "confirm_password": "NewPass123",
+        }
+
+        response = self.client.post(self.change_password_url, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

@@ -1,5 +1,5 @@
 import { Button, Form, Input, Modal, Rate, message } from 'antd';
-import { createReview } from '../api/reviews';
+import { createReview } from '../../api/reviews';
 
 interface Props {
   open: boolean;

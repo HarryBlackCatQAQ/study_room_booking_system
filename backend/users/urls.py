@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import RegisterView, MeView
+from .views import ChangePasswordView, RegisterView, MeView
 from config.routes import UsersRoutes
 
 app_name = UsersRoutes.APP_NAME
@@ -17,6 +17,8 @@ urlpatterns = [
 
     # add the url for the me view
     path(UsersRoutes.ME_PATH, MeView.as_view(), name=UsersRoutes.ME_NAME),
+
+    path(UsersRoutes.CHANGE_PASSWORD_PATH, ChangePasswordView.as_view(), name=UsersRoutes.CHANGE_PASSWORD_NAME),
 
     
 ]
