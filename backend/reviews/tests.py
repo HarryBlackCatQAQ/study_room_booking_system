@@ -1,8 +1,12 @@
+from datetime import time, timedelta
+
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from bookings.models import Booking
 from config.routes import ReviewsRoutes
 from rooms.models import Building, Room
 from .models import Review
@@ -35,9 +39,39 @@ class ReviewAPITests(APITestCase):
             building=self.building,
         )
 
+        today = timezone.now().date()
+
+        self.ended_booking = Booking.objects.create(
+            student=self.student_user,
+            room=self.room,
+            booking_date=today - timedelta(days=1),
+            start_time=time(9, 0),
+            end_time=time(10, 0),
+            status='approved',
+        )
+
+        self.future_booking = Booking.objects.create(
+            student=self.student_user,
+            room=self.room,
+            booking_date=today + timedelta(days=1),
+            start_time=time(9, 0),
+            end_time=time(10, 0),
+            status='approved',
+        )
+
+        self.reviewed_booking = Booking.objects.create(
+            student=self.student_user,
+            room=self.room,
+            booking_date=today - timedelta(days=2),
+            start_time=time(14, 0),
+            end_time=time(15, 0),
+            status='approved',
+        )
+
         self.review = Review.objects.create(
             student=self.student_user,
             room=self.room,
+            booking=self.reviewed_booking,
             rating=5,
             comment="Very quiet and good for study.",
         )
@@ -86,8 +120,6 @@ class ReviewAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Review.objects.count(), 1)
-    
-
 
     def test_create_review_fail_when_booking_already_reviewed(self):
         self.client.force_authenticate(user=self.student_user)
@@ -113,5 +145,3 @@ class ReviewAPITests(APITestCase):
         response = self.client.post(self.reviews_url, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-
