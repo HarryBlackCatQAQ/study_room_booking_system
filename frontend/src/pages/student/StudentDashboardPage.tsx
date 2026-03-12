@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getMyBookings } from '../../api/bookings';
 import { getRooms } from '../../api/rooms';
 import type { Booking, Room } from '../../types';
+import dayjs from 'dayjs';
 
 export default function StudentDashboardPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -20,10 +21,38 @@ export default function StudentDashboardPage() {
     })();
   }, []);
 
-  // filter bookings by status (pending, approved)
-  const upcoming = bookings.filter((b) => ['pending', 'approved'].includes(b.status));
-  // filter bookings by status (cancelled, rejected)
-  const history = bookings.filter((b) => ['cancelled', 'rejected'].includes(b.status));
+  // check whether an approved booking has already ended
+  const isEndedBooking = (booking: Booking) => {
+    const bookingEnd = dayjs(`${booking.booking_date}T${booking.end_time}`);
+    return bookingEnd.isBefore(dayjs());
+  };
+
+  // pending + approved but not ended yet
+  const upcoming = bookings.filter((booking) => {
+    if (booking.status === 'pending') {
+      return true;
+    }
+
+    if (booking.status === 'approved') {
+      return !isEndedBooking(booking);
+    }
+
+    return false;
+  });
+
+
+  // approved and ended + cancelled + rejected
+  const history = bookings.filter((booking) => {
+    if (['cancelled', 'rejected'].includes(booking.status)) {
+      return true;
+    }
+
+    if (booking.status === 'approved') {
+      return isEndedBooking(booking);
+    }
+
+    return false;
+  });
 
   return (
     <>

@@ -9,6 +9,8 @@ class BookingSerializer(serializers.ModelSerializer):
     # find the name of the room, set read only to true, not save to database
     room_name = serializers.CharField(source='room.name', read_only=True)
 
+    review_submitted = serializers.SerializerMethodField()
+
     # the serializer for the Booking model
     class Meta:
         model = Booking
@@ -26,10 +28,15 @@ class BookingSerializer(serializers.ModelSerializer):
             'status',
             'processed_by',
             'created_at',
+            'review_submitted',
         ]
         
         # set the fields that are read only
         read_only_fields = ['student', 'status', 'processed_by', 'created_at']
+    
+    def get_review_submitted(self, obj):
+        return hasattr(obj, 'review')
+
 
 
 # define a sserializer for creating new bookings

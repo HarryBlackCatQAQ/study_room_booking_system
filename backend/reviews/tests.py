@@ -55,11 +55,11 @@ class ReviewAPITests(APITestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["room"], self.room.id)
 
-    def test_create_review_success_with_authentication(self):
+    def test_create_review_success_for_ended_booking(self):
         self.client.force_authenticate(user=self.student_user)
 
         payload = {
-            "room": self.room.id,
+            "booking": self.ended_booking.id,
             "rating": 4,
             "comment": "Projector works well.",
         }
@@ -68,12 +68,44 @@ class ReviewAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Review.objects.count(), 2)
-        review = Review.objects.order_by("-id").first()
+
+        review = Review.objects.get(booking=self.ended_booking)
         self.assertEqual(review.student, self.student_user)
+        self.assertEqual(review.room, self.room)
+
+    def test_create_review_fail_for_booking_not_ended(self):
+        self.client.force_authenticate(user=self.student_user)
+
+        payload = {
+            "booking": self.future_booking.id,
+            "rating": 4,
+            "comment": "Too early to review.",
+        }
+
+        response = self.client.post(self.reviews_url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Review.objects.count(), 1)
+    
+
+
+    def test_create_review_fail_when_booking_already_reviewed(self):
+        self.client.force_authenticate(user=self.student_user)
+
+        payload = {
+            "booking": self.reviewed_booking.id,
+            "rating": 3,
+            "comment": "Trying to submit again.",
+        }
+
+        response = self.client.post(self.reviews_url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Review.objects.count(), 1)
 
     def test_create_review_fail_without_authentication(self):
         payload = {
-            "room": self.room.id,
+            "booking": self.ended_booking.id,
             "rating": 4,
             "comment": "Projector works well.",
         }
@@ -81,3 +113,5 @@ class ReviewAPITests(APITestCase):
         response = self.client.post(self.reviews_url, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+

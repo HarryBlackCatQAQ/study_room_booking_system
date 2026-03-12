@@ -11,6 +11,7 @@ export interface Booking {
   status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   processed_by?: number | null;
   created_at?: string;
+  review_submitted?: boolean;
 }
 
 // interface for creating a booking

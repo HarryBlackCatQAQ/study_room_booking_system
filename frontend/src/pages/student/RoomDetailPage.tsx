@@ -1,7 +1,7 @@
-import { Button, Card, Descriptions, List, Rate, Space, Tag, Typography, message } from 'antd';
+import { Button, Card, Descriptions, List, Rate, Space, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { createReview, getReviews } from '../../api/reviews';
+import { getReviews } from '../../api/reviews';
 import { getRoomDetail } from '../../api/rooms';
 import BookingModal from '../../components/BookingModal';
 import LoadingScreen from '../../components/LoadingScreen';
@@ -55,15 +55,6 @@ export default function RoomDetailPage() {
     return <Typography.Text>Room not found.</Typography.Text>;
   }
 
-  const handleQuickReview = async () => {
-    try {
-      await createReview({ room: room.id, rating: 5, comment: 'Good room for study.' });
-      message.success('Review submitted');
-      await loadData();
-    } catch {
-      message.error('Failed to submit review');
-    }
-  };
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -89,7 +80,6 @@ export default function RoomDetailPage() {
         {/* Render action buttons */}
         <Space style={{ marginTop: 16 }} wrap>
           <Button type="primary" onClick={() => setBookingOpen(true)}>Book this room</Button>
-          <Button onClick={handleQuickReview}>Leave quick 5-star review</Button>
         </Space>
       </Card>
 

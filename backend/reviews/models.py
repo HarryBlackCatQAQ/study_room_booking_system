@@ -2,6 +2,7 @@ from django.db import models
 
 from users.models import User
 from rooms.models import Room
+from bookings.models import Booking
 
 # Create your models here.
 
@@ -15,6 +16,8 @@ class Review(models.Model):
 
     # The rating of the review (1-5) using a positive integer
     rating = models.PositiveIntegerField()
+
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE, null=True, blank=True, related_name='review')
 
     # The comment associated with the review
     comment = models.TextField(blank=True)
