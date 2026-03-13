@@ -17,7 +17,13 @@ from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+DJANGO_ENV = os.getenv("DJANGO_ENV", "development")
+env_file = BASE_DIR / f".env.{DJANGO_ENV}"
+
+if env_file.exists():
+    load_dotenv(env_file)
+else:
+    load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -42,9 +48,14 @@ def get_env_list(name, default=None):
 
 ALLOWED_HOSTS = get_env_list(
     "ALLOWED_HOSTS",
-    ["127.0.0.1", "localhost", "itbe.ttz3305012.uk"],
+    ["127.0.0.1", "localhost"],
 )
-
+# CORS Settings the allowed origins for the frontend application 
+# the frontend application is running on http://localhost:5173
+CORS_ALLOWED_ORIGINS = get_env_list(
+    "CORS_ALLOWED_ORIGINS",
+    ["http://localhost:5173"],
+)
 
 # Application definition
 
@@ -165,13 +176,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
-# CORS Settings the allowed origins for the frontend application 
-# the frontend application is running on http://localhost:5173
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://it5012.ttz3305012.uk",
-    "https://itbe.ttz3305012.uk",
-]
+
 
 # REST Framework Settings 
 REST_FRAMEWORK = {

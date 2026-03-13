@@ -1,12 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => {
+  const isPublic = mode === 'public'
 
-  server: {
-    host: '0.0.0.0',
-    allowedHosts: ['it5012.ttz3305012.uk']
+  return {
+    plugins: [react()],
+    server: isPublic
+      ? {
+          host: '0.0.0.0',
+          allowedHosts: ['it5012.ttz3305012.uk'],
+        }
+      : {
+          host: '127.0.0.1',
+        },
   }
 })
