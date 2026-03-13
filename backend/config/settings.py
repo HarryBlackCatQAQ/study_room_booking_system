@@ -28,7 +28,22 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+
+def get_env_list(name, default=None):
+    if default is None:
+        default = []
+
+    raw_value = os.getenv(name)
+    if not raw_value:
+        return default
+
+    return [item.strip() for item in raw_value.split(",") if item.strip()]
+
+
+ALLOWED_HOSTS = get_env_list(
+    "ALLOWED_HOSTS",
+    ["127.0.0.1", "localhost", "itbe.ttz3305012.uk"],
+)
 
 
 # Application definition
@@ -154,6 +169,8 @@ AUTH_USER_MODEL = 'users.User'
 # the frontend application is running on http://localhost:5173
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://it5012.ttz3305012.uk",
+    "https://itbe.ttz3305012.uk",
 ]
 
 # REST Framework Settings 

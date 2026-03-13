@@ -1,9 +1,27 @@
 import axios from 'axios';
 import { getAccessToken } from '../utils/auth';
 
+function normalizeApiBaseUrl(rawValue?: string) {
+  if (!rawValue) {
+    return rawValue;
+  }
+
+  const trimmedValue = rawValue.trim().replace(/\/+$/, '');
+
+  if (/^https?:\/\//i.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  if (/^(localhost|127\.0\.0\.1)(:\d+)?$/i.test(trimmedValue)) {
+    return `http://${trimmedValue}`;
+  }
+
+  return `https://${trimmedValue}`;
+}
+
 // Create an axios instance with a base URL and timeout
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL),
   timeout: 10000,
 });
 
