@@ -1,6 +1,14 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import ChangePasswordView, RegisterView, MeView
+from .views import (
+    AdminUserCreateView,
+    AdminUserDeleteView,
+    AdminUserListView,
+    AdminUserUpdateView,
+    ChangePasswordView,
+    MeView,
+    RegisterView,
+)
 from config.routes import UsersRoutes
 
 app_name = UsersRoutes.APP_NAME
@@ -20,5 +28,9 @@ urlpatterns = [
 
     path(UsersRoutes.CHANGE_PASSWORD_PATH, ChangePasswordView.as_view(), name=UsersRoutes.CHANGE_PASSWORD_NAME),
 
-    
+    # add the url for admin user management
+    path(UsersRoutes.ADMIN_LIST_PATH, AdminUserListView.as_view(), name=UsersRoutes.ADMIN_LIST_NAME),
+    path(UsersRoutes.ADMIN_CREATE_PATH, AdminUserCreateView.as_view(), name=UsersRoutes.ADMIN_CREATE_NAME),
+    path(UsersRoutes.ADMIN_UPDATE_PATH, AdminUserUpdateView.as_view(), name=UsersRoutes.ADMIN_UPDATE_NAME),
+    path(UsersRoutes.ADMIN_DELETE_PATH, AdminUserDeleteView.as_view(), name=UsersRoutes.ADMIN_DELETE_NAME),
 ]

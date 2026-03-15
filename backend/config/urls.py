@@ -34,4 +34,7 @@ urlpatterns = [
 
     # using the api/reviews/ prefix path for the reviews urls
     path(ApiPrefix.REVIEWS, include('reviews.urls')),
+
+    # using the api/support/ prefix path for the support urls
+    path(ApiPrefix.SUPPORT, include('support.urls')),
 ]

@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Input, Modal, Space, Table, Typography, message } from 'antd';
+import { Button, Card, Form, Input, Modal, Space, Table, Typography, message, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { createEquipment, deleteEquipment, getEquipments, updateEquipment } from '../../api/rooms';
 import type { Equipment } from '../../types';
@@ -46,6 +46,10 @@ export default function EquipmentManagementPage() {
   useEffect(() => {
     void loadData();
   }, []);
+
+  const availableEquipmentsCount = equipments.filter((item) => item.status.toLowerCase() === 'available').length;
+  const otherEquipmentsCount = equipments.length - availableEquipmentsCount;
+
 
   // open create
   const openCreate = () => {
@@ -122,28 +126,93 @@ export default function EquipmentManagementPage() {
   };
 
   return (
-    <Card
-      title={<Typography.Title level={3} style={{ margin: 0 }}>Equipment Management</Typography.Title>}
-      extra={<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>Add Equipment</Button>}
-    >
-      <Table
-        rowKey="id"
-        loading={loading}
-        dataSource={equipments}
-        columns={[
-          { title: 'Name', dataIndex: 'name' },
-          { title: 'Status', dataIndex: 'status' },
-          {
-            title: 'Actions',
-            render: (_, record: Equipment) => (
-              <Space>
-                <Button icon={<EditOutlined />} onClick={() => openEdit(record)}>Edit</Button>
-                <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}>Delete</Button>
-              </Space>
-            ),
-          },
-        ]}
-      />
+    <div className="records-page">
+
+      <div className="records-hero">
+        <div className="records-hero__copy">
+          <Typography.Text className="records-hero__eyebrow">
+            Admin resources
+          </Typography.Text>
+
+          <Typography.Title level={2} className="records-hero__title">
+            Equipment Management
+          </Typography.Title>
+
+          <Typography.Paragraph className="records-hero__desc">
+            Maintain equipment names and status so room filters and room details stay useful for students.
+          </Typography.Paragraph>
+
+          <div className="records-pills">
+            <span className="records-pill">{equipments.length} equipment items</span>
+            <span className="records-pill">{availableEquipmentsCount} available</span>
+            <span className="records-pill">{otherEquipmentsCount} other status</span>
+          </div>
+        </div>
+
+        <div className="records-hero__aside">
+          <div className="records-hero__panel">
+            <Typography.Text className="records-hero__panel-label">
+              Available items
+            </Typography.Text>
+
+            <Typography.Title level={3} className="records-hero__panel-value">
+              {availableEquipmentsCount}
+            </Typography.Title>
+
+            <Typography.Paragraph className="records-hero__panel-copy">
+              {otherEquipmentsCount} equipment item{otherEquipmentsCount === 1 ? '' : 's'} still use another status.
+            </Typography.Paragraph>
+          </div>
+        </div>
+      </div>
+
+      <div className="records-toolbar">
+        <div className="records-toolbar__content">
+          <Typography.Text className="records-toolbar__title">
+            Manage equipment records
+          </Typography.Text>
+
+          <Typography.Text className="records-toolbar__meta">
+            {equipments.length} item{equipments.length === 1 ? '' : 's'} in the current list
+          </Typography.Text>
+        </div>
+
+        <div className="records-toolbar__actions">
+          <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+            Add Equipment
+          </Button>
+        </div>
+      </div>
+
+
+      <Card className="records-table-card">
+        <Table
+          rowKey="id"
+          loading={loading}
+          dataSource={equipments}
+          columns={[
+            { title: 'Name', dataIndex: 'name' },
+            {
+              title: 'Status',
+              dataIndex: 'status',
+              render: (status: string) => (
+                <Tag color={status.toLowerCase() === 'available' ? 'green' : 'default'}>
+                  {status}
+                </Tag>
+              ),
+            },
+            {
+              title: 'Actions',
+              render: (_, record: Equipment) => (
+                <Space>
+                  <Button icon={<EditOutlined />} onClick={() => openEdit(record)}>Edit</Button>
+                  <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}>Delete</Button>
+                </Space>
+              ),
+            },
+          ]}
+        />
+      </Card>
 
       <Modal
         open={open}
@@ -157,6 +226,8 @@ export default function EquipmentManagementPage() {
           <Form.Item label="Status" name="status" rules={[{ required: true }]}><Input /></Form.Item>
         </Form>
       </Modal>
-    </Card>
+
+    </div>
   );
+
 }

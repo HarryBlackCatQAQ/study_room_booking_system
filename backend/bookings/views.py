@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Booking
 from .serializers import BookingSerializer, BookingCreateSerializer
+from rooms.permissions import IsRoleAdmin
+
 
 # define a view for creating new bookings
 class BookingCreateView(generics.CreateAPIView):
@@ -53,11 +55,11 @@ class AdminBookingListView(generics.ListAPIView):
     # order the bookings by creation date
     queryset = Booking.objects.all().order_by('-created_at')
     serializer_class = BookingSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsRoleAdmin]
 
 # define a view for approving a booking (admin)
 class ApproveBookingView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsRoleAdmin]
 
     # override the patch method to approve the booking
     def patch(self, request, pk):
@@ -80,7 +82,7 @@ class ApproveBookingView(APIView):
 
 # define a view for rejecting a booking (admin)
 class RejectBookingView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsRoleAdmin]
 
     def patch(self, request, pk):
         try:

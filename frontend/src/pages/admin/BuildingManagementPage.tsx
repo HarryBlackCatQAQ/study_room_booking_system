@@ -38,6 +38,10 @@ export default function BuildingManagementPage() {
     void loadData();
   }, []);
 
+  const campusAreaCount = new Set(buildings.map((item) => item.campus_area).filter(Boolean)).size;
+  const openingHoursCount = buildings.filter((item) => item.opening_hours).length;
+
+
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
@@ -90,29 +94,86 @@ export default function BuildingManagementPage() {
   };
 
   return (
-    <Card
-      title={<Typography.Title level={3} style={{ margin: 0 }}>Building Management</Typography.Title>}
-      extra={<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>Add Building</Button>}
-    >
-      <Table
-        rowKey="id"
-        loading={loading}
-        dataSource={buildings}
-        columns={[
-          { title: 'Name', dataIndex: 'name' },
-          { title: 'Campus Area', dataIndex: 'campus_area' },
-          { title: 'Opening Hours', dataIndex: 'opening_hours' },
-          {
-            title: 'Actions',
-            render: (_, record: Building) => (
-              <Space>
-                <Button icon={<EditOutlined />} onClick={() => openEdit(record)}>Edit</Button>
-                <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}>Delete</Button>
-              </Space>
-            ),
-          },
-        ]}
-      />
+    <div className="records-page">
+
+      <div className="records-hero">
+        <div className="records-hero__copy">
+          <Typography.Text className="records-hero__eyebrow">
+            Admin locations
+          </Typography.Text>
+
+          <Typography.Title level={2} className="records-hero__title">
+            Building Management
+          </Typography.Title>
+
+          <Typography.Paragraph className="records-hero__desc">
+            Keep building names, campus areas, and opening hours aligned with the real campus layout.
+          </Typography.Paragraph>
+
+          <div className="records-pills">
+            <span className="records-pill">{buildings.length} buildings</span>
+            <span className="records-pill">{campusAreaCount} campus areas</span>
+            <span className="records-pill">{openingHoursCount} with opening hours</span>
+          </div>
+        </div>
+
+        <div className="records-hero__aside">
+          <div className="records-hero__panel">
+            <Typography.Text className="records-hero__panel-label">
+              Campus locations
+            </Typography.Text>
+
+            <Typography.Title level={3} className="records-hero__panel-value">
+              {buildings.length}
+            </Typography.Title>
+
+            <Typography.Paragraph className="records-hero__panel-copy">
+              {openingHoursCount} building{openingHoursCount === 1 ? '' : 's'} already have opening hours configured.
+            </Typography.Paragraph>
+          </div>
+        </div>
+      </div>
+
+      <div className="records-toolbar">
+        <div className="records-toolbar__content">
+          <Typography.Text className="records-toolbar__title">
+            Manage campus buildings
+          </Typography.Text>
+
+          <Typography.Text className="records-toolbar__meta">
+            {campusAreaCount} campus area{campusAreaCount === 1 ? '' : 's'} linked to these records
+          </Typography.Text>
+        </div>
+
+        <div className="records-toolbar__actions">
+          <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+            Add Building
+          </Button>
+        </div>
+      </div>
+
+
+      <Card className="records-table-card">
+        <Table
+          rowKey="id"
+          loading={loading}
+          dataSource={buildings}
+          columns={[
+            { title: 'Name', dataIndex: 'name' },
+            { title: 'Campus Area', dataIndex: 'campus_area' },
+            { title: 'Opening Hours', dataIndex: 'opening_hours' },
+            {
+              title: 'Actions',
+              render: (_, record: Building) => (
+                <Space>
+                  <Button icon={<EditOutlined />} onClick={() => openEdit(record)}>Edit</Button>
+                  <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}>Delete</Button>
+                </Space>
+              ),
+            },
+          ]}
+        />
+      </Card>
 
       <Modal
         open={open}
@@ -127,6 +188,8 @@ export default function BuildingManagementPage() {
           <Form.Item label="Opening hours" name="opening_hours"><Input placeholder="For example: 08:00-22:00" /></Form.Item>
         </Form>
       </Modal>
-    </Card>
+
+    </div>
   );
+
 }

@@ -8,7 +8,9 @@ export type {
     RegisterPayload, 
     TokenResponse, 
     User,
-    ChangePasswordPayload
+    ChangePasswordPayload,
+    AdminUser,
+    AdminUserPayload
 } from './auth';
 
 // Import the types from the booking
@@ -37,3 +39,12 @@ export type {
     BuildingPayload,
     EquipmentPayload
 } from './room';
+
+// Import the types from the support chat
+export type {
+    SupportConversation,
+    SupportConversationSummary,
+    SupportMessage,
+    SupportMessagePage,
+    SupportMessagePayload
+} from './support';

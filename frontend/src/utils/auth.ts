@@ -5,6 +5,11 @@ export function getAccessToken() {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
 }
 
+// Set the access token in localStorage
+export function setAccessToken(access: string) {
+  localStorage.setItem(ACCESS_TOKEN_KEY, access);
+}
+
 // Get the refresh token from localStorage
 export function getRefreshToken() {
   return localStorage.getItem(REFRESH_TOKEN_KEY);

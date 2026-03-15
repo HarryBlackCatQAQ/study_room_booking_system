@@ -1,10 +1,20 @@
+from django.core.cache import cache
+from django.db import transaction
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import generics, permissions
+
 from .models import Review
 from .serializers import ReviewSerializer
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
+
+    # cache(redis) reviews page for 5 minutes
+    @method_decorator(cache_page(60 * 5))
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
     # filter reviews by room
     def get_queryset(self):
@@ -33,3 +43,6 @@ class ReviewListCreateView(generics.ListCreateAPIView):
 
         # set the student field to the current user
         serializer.save(student=self.request.user, room=booking.room)
+
+        # clear the cache when a new review is created
+        transaction.on_commit(cache.clear)

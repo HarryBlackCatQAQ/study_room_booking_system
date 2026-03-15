@@ -3,7 +3,6 @@ import type {
   Building,
   Equipment,
   Room,
-  RoomPayload,
   BuildingPayload,
   EquipmentPayload,
 } from '../types';

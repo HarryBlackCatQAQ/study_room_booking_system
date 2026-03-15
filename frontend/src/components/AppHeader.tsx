@@ -15,6 +15,9 @@ export default function AppHeader() {
   // Get the navigate function from react-router
   const navigate = useNavigate();
 
+  const roleLabel = user?.role === 'admin' ? 'Administrator' : 'Student';
+
+
   // Handle the logout action by calling the logout function and navigating to the login page
   const handleLogout = () => {
     logout();
@@ -53,61 +56,75 @@ export default function AppHeader() {
 
   //
   return (
-    // Use Ant Design's Layout.Header component to create a header with a white background and a bottom border
-    <Layout.Header style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '0 24px' }}>
+    // Use Ant Design's Layout.Header component to create a cleaner app shell header
+    <Layout.Header className="topbar">
 
-      {/* Use Space to layout the title and user actions with space between them */}
-      <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+      <div className="topbar__inner">
 
         {/* Use Link to create a link to the home page */}
-        <Link to="/" style={{ color: 'inherit' }}>
+        <Link to="/" className="brand-link" style={{ color: 'inherit' }}>
 
-          {/* Use Space to layout the logo and title with some spacing */}
-          <Space size={14} align="center" style={{display: 'flex', alignItems: 'center', lineHeight: 1}}>
+          {/* Use a brand block to layout the logo and title */}
+          <div className="brand">
 
             {/* Logo of the application */}
-            <img
-            src="/studynest-mark.png"
-            alt={`${appName} logo`}
-            style={{
-              width: 34,
-              height: 34,
-              objectFit: 'contain',
-              display: 'block',
-              flexShrink: 0
-            }}
-          />
+            <div className="brand__mark">
+              <img
+                src="/studynest-mark.png"
+                alt={`${appName} logo`}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
+                }}
+              />
+            </div>
 
             {/* Title of the application */}
-            <Typography.Title level={4} style={{ margin: 0, lineHeight: 1, transform: 'translateY(1px)'}}>
-              {appName}
-            </Typography.Title>
-            
-          </Space>
-          
+            <div className="brand__copy">
+              <Typography.Text className="brand__eyebrow">
+                Campus room booking
+              </Typography.Text>
+
+              <Typography.Title level={4} className="brand__title">
+                {appName}
+              </Typography.Title>
+            </div>
+
+
+          </div>
+
         </Link>
 
-        {/* If the user is logged in, show their username and role, 
+        {/* If the user is logged in, show their username and role,
         along with a logout button. Otherwise, show login and register buttons. */}
-        <Space>
+        <Space className="topbar__actions">
           {user ? (
             <Dropdown menu={{ items: menuItems, onClick: handleMenuClick }} trigger={['click']}>
-              <Button type="text" style={{ height: 'auto', padding: 4 }}>
+              <Button type="text" className="user-chip">
                 <Space size="small">
                   <Avatar icon={<UserOutlined />} />
-                  <Typography.Text>{user.username}</Typography.Text>
+
+                  <div className="user-chip__meta">
+                    <Typography.Text className="user-chip__name">{user.username}</Typography.Text>
+                    <Typography.Text type="secondary" className="user-chip__role">
+                      {roleLabel}
+                    </Typography.Text>
+                  </div>
                 </Space>
               </Button>
             </Dropdown>
           ) : (
             <>
               <Link to="/login"><Button>Login</Button></Link>
-              <Link to="/register"><Button type="primary">Register</Button></Link>
+              <Link to="/register"><Button type="primary" className="topbar__cta">Create account</Button></Link>
             </>
           )}
         </Space>
 
-      </Space>
+      </div>
+
     </Layout.Header>
   );
+
 }

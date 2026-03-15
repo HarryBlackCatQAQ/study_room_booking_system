@@ -65,6 +65,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
+    'channels',
     'django.contrib.staticfiles',
 
     'corsheaders',
@@ -75,6 +77,7 @@ INSTALLED_APPS = [
     'rooms',
     'bookings',
     'reviews',
+    'support',
 ]
 
 MIDDLEWARE = [
@@ -89,6 +92,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
+ASGI_APPLICATION = 'config.asgi.application'
 
 TEMPLATES = [
     {
@@ -199,4 +203,27 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}
+
+
+
+
+REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:5013/1")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+        "TIMEOUT": 300,
+        "KEY_PREFIX": "study_room_booking_system",
+    }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [REDIS_URL],
+        },
+    }
 }

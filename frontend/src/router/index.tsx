@@ -6,6 +6,7 @@ import RoleGuard from '../components/RoleGuard';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
 import BookingRequestsPage from '../pages/admin/BookingRequestsPage';
 import RoomManagementPage from '../pages/admin/RoomManagementPage';
+import UserManagementPage from '../pages/admin/UserManagementPage';
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 import LandingPage from '../pages/shared/LandingPage';
@@ -18,6 +19,7 @@ import RoomsPage from '../pages/student/RoomsPage';
 import StudentDashboardPage from '../pages/student/StudentDashboardPage';
 import BuildingManagementPage from '../pages/admin/BuildingManagementPage';
 import EquipmentManagementPage from '../pages/admin/EquipmentManagementPage';
+import SupportMessagesPage from '../pages/admin/SupportMessagesPage';
 
 // Define the application routes using React Router
 export const router = createBrowserRouter([
@@ -88,6 +90,12 @@ export const router = createBrowserRouter([
 
               // the admin booking requests page
               { path: 'requests', element: <BookingRequestsPage /> },
+
+              // the admin support messages page
+              { path: 'support', element: <SupportMessagesPage /> },
+
+              // the admin user management page
+              { path: 'users', element: <UserManagementPage /> },
 
               // the admin profile page
               { path: 'profile', element: <ProfilePage /> },

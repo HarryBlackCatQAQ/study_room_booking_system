@@ -3,3 +3,4 @@ class ApiPrefix:
     ROOMS = "api/rooms/"
     BOOKINGS = "api/bookings/"
     REVIEWS = "api/reviews/"
+    SUPPORT = "api/support/"
