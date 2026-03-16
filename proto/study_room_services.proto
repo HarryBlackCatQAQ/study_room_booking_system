@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package studyroom.v1;
+
+option java_multiple_files = true;
+option java_package = "com.studynest.grpc";
+option java_outer_classname = "StudyRoomServicesProto";
+option go_package = "study-room-grpc/proto;studyroompb";
+
+message RoomSnapshot {
+  int64 room_id = 1;
+  string room_name = 2;
+  int32 capacity = 3;
+  int64 building_id = 4;
+  string building_name = 5;
+  repeated string equipment_names = 6;
+  bool is_active = 7;
+}
+
+message BookingSnapshot {
+  int64 room_id = 1;
+  string booking_date = 2; // YYYY-MM-DD
+  string start_time = 3;   // HH:MM
+  string end_time = 4;     // HH:MM
+  string status = 5;
+}
+
+message ReviewStat {
+  int64 room_id = 1;
+  double average_rating = 2;
+  int32 review_count = 3;
+}
+
+message RecommendationRequest {
+  string booking_date = 1;
+  string start_time = 2;
+  string end_time = 3;
+  int32 min_capacity = 4;
+  repeated string required_equipment = 5;
+  int64 preferred_building_id = 6;
+  repeated RoomSnapshot rooms = 7;
+  repeated BookingSnapshot bookings = 8;
+  repeated ReviewStat review_stats = 9;
+}
+
+message RecommendedRoom {
+  int64 room_id = 1;
+  string room_name = 2;
+  string building_name = 3;
+  double score = 4;
+  string reason = 5;
+}
+
+message RecommendationResponse {
+  repeated RecommendedRoom rooms = 1;
+}
+
+message AvailabilityRequest {
+  string booking_date = 1;
+  string search_start_time = 2;
+  string search_end_time = 3;
+  int32 duration_minutes = 4;
+  int32 min_capacity = 5;
+  int64 building_id = 6;
+  repeated string required_equipment = 7;
+  repeated RoomSnapshot rooms = 8;
+  repeated BookingSnapshot bookings = 9;
+}
+
+message AvailableSlot {
+  int64 room_id = 1;
+  string room_name = 2;
+  string building_name = 3;
+  string start_time = 4;
+  string end_time = 5;
+}
+
+message AvailabilityResponse {
+  repeated AvailableSlot slots = 1;
+}
+
+message PendingBookingSnapshot {
+  int64 booking_id = 1;
+  string booking_date = 2; // YYYY-MM-DD
+  string start_time = 3;   // HH:MM
+  string status = 4;
+}
+
+message ExpiredPendingBookingsRequest {
+  string current_date = 1; // YYYY-MM-DD
+  string current_time = 2; // HH:MM
+  repeated PendingBookingSnapshot bookings = 3;
+}
+
+message ExpiredPendingBookingsResponse {
+  repeated int64 expired_booking_ids = 1;
+}
+
+service RoomRecommendationService {
+  rpc RecommendRooms(RecommendationRequest) returns (RecommendationResponse);
+}
+
+service AvailabilityService {
+  rpc FindAvailableSlots(AvailabilityRequest) returns (AvailabilityResponse);
+}
+
+service BookingLifecycleService {
+  rpc FindExpiredPendingBookings(ExpiredPendingBookingsRequest) returns (ExpiredPendingBookingsResponse);
+}

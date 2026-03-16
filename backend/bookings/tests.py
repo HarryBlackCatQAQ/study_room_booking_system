@@ -1,7 +1,8 @@
-from datetime import date, time
+from datetime import time, timedelta
 
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -12,11 +13,15 @@ from .models import Booking
 User = get_user_model()
 
 
+# test the booking api for student and admin flows
 class BookingAPITests(APITestCase):
+    # create shared users, room data, and urls used by the test cases
     def setUp(self):
         self.bookings_url = reverse(BookingsRoutes.CREATE_FULL_NAME)
         self.my_bookings_url = reverse(BookingsRoutes.MY_LIST_FULL_NAME)
         self.admin_all_url = reverse(BookingsRoutes.ADMIN_LIST_FULL_NAME)
+        self.future_booking_date = timezone.localdate() + timedelta(days=2)
+        self.other_future_booking_date = timezone.localdate() + timedelta(days=3)
 
         self.student_user = User.objects.create_user(
             username="student1",
@@ -51,7 +56,7 @@ class BookingAPITests(APITestCase):
 
         payload = {
             "room": self.room.id,
-            "booking_date": "2026-03-10",
+            "booking_date": self.future_booking_date.isoformat(),
             "start_time": "10:00:00",
             "end_time": "12:00:00",
         }
@@ -64,10 +69,11 @@ class BookingAPITests(APITestCase):
         self.assertEqual(booking.student, self.student_user)
         self.assertEqual(booking.status, "pending")
 
+    # booking creation should require login
     def test_create_booking_fail_without_authentication(self):
         payload = {
             "room": self.room.id,
-            "booking_date": "2026-03-10",
+            "booking_date": self.future_booking_date.isoformat(),
             "start_time": "10:00:00",
             "end_time": "12:00:00",
         }
@@ -81,7 +87,7 @@ class BookingAPITests(APITestCase):
 
         payload = {
             "room": self.room.id,
-            "booking_date": "2026-03-10",
+            "booking_date": self.future_booking_date.isoformat(),
             "start_time": "14:00:00",
             "end_time": "12:00:00",
         }
@@ -94,7 +100,7 @@ class BookingAPITests(APITestCase):
         Booking.objects.create(
             student=self.student_user,
             room=self.room,
-            booking_date=date(2026, 3, 10),
+            booking_date=self.future_booking_date,
             start_time=time(10, 0),
             end_time=time(12, 0),
             status="approved",
@@ -104,7 +110,7 @@ class BookingAPITests(APITestCase):
 
         payload = {
             "room": self.room.id,
-            "booking_date": "2026-03-10",
+            "booking_date": self.future_booking_date.isoformat(),
             "start_time": "11:00:00",
             "end_time": "13:00:00",
         }
@@ -124,7 +130,7 @@ class BookingAPITests(APITestCase):
         Booking.objects.create(
             student=self.student_user,
             room=self.room,
-            booking_date=date(2026, 3, 10),
+            booking_date=self.future_booking_date,
             start_time=time(10, 0),
             end_time=time(12, 0),
             status="pending",
@@ -133,7 +139,7 @@ class BookingAPITests(APITestCase):
         Booking.objects.create(
             student=other_user,
             room=self.room,
-            booking_date=date(2026, 3, 11),
+            booking_date=self.other_future_booking_date,
             start_time=time(10, 0),
             end_time=time(12, 0),
             status="pending",
@@ -149,7 +155,7 @@ class BookingAPITests(APITestCase):
         booking = Booking.objects.create(
             student=self.student_user,
             room=self.room,
-            booking_date=date(2026, 3, 10),
+            booking_date=self.future_booking_date,
             start_time=time(10, 0),
             end_time=time(12, 0),
             status="pending",
@@ -175,7 +181,7 @@ class BookingAPITests(APITestCase):
         booking = Booking.objects.create(
             student=other_user,
             room=self.room,
-            booking_date=date(2026, 3, 10),
+            booking_date=self.future_booking_date,
             start_time=time(10, 0),
             end_time=time(12, 0),
             status="pending",
@@ -188,11 +194,12 @@ class BookingAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    # admins can review all booking records
     def test_admin_get_all_bookings_success(self):
         Booking.objects.create(
             student=self.student_user,
             room=self.room,
-            booking_date=date(2026, 3, 10),
+            booking_date=self.future_booking_date,
             start_time=time(10, 0),
             end_time=time(12, 0),
             status="pending",
@@ -208,7 +215,7 @@ class BookingAPITests(APITestCase):
         booking = Booking.objects.create(
             student=self.student_user,
             room=self.room,
-            booking_date=date(2026, 3, 10),
+            booking_date=self.future_booking_date,
             start_time=time(10, 0),
             end_time=time(12, 0),
             status="pending",
@@ -228,7 +235,7 @@ class BookingAPITests(APITestCase):
         booking = Booking.objects.create(
             student=self.student_user,
             room=self.room,
-            booking_date=date(2026, 3, 10),
+            booking_date=self.future_booking_date,
             start_time=time(10, 0),
             end_time=time(12, 0),
             status="pending",
@@ -243,3 +250,44 @@ class BookingAPITests(APITestCase):
         booking.refresh_from_db()
         self.assertEqual(booking.status, "rejected")
         self.assertEqual(booking.processed_by, self.admin_user)
+
+    # expired pending bookings should be auto-rejected before list and approval actions
+    def test_my_bookings_auto_rejects_expired_pending_booking(self):
+        expired_booking = Booking.objects.create(
+            student=self.student_user,
+            room=self.room,
+            booking_date=timezone.localdate() - timedelta(days=1),
+            start_time=time(10, 0),
+            end_time=time(12, 0),
+            status="pending",
+        )
+
+        self.client.force_authenticate(user=self.student_user)
+        response = self.client.get(self.my_bookings_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        expired_booking.refresh_from_db()
+        self.assertEqual(expired_booking.status, "rejected")
+        self.assertEqual(response.data[0]["status"], "rejected")
+
+    def test_admin_cannot_approve_expired_pending_booking(self):
+        expired_booking = Booking.objects.create(
+            student=self.student_user,
+            room=self.room,
+            booking_date=timezone.localdate() - timedelta(days=1),
+            start_time=time(10, 0),
+            end_time=time(12, 0),
+            status="pending",
+        )
+
+        approve_url = reverse(BookingsRoutes.APPROVE_FULL_NAME, kwargs={"pk": expired_booking.id})
+
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.patch(approve_url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        expired_booking.refresh_from_db()
+        self.assertEqual(expired_booking.status, "rejected")
+        self.assertEqual(expired_booking.processed_by, None)

@@ -11,6 +11,8 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
+# load the main django settings module for wsgi servers
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
+# expose the wsgi application object used by deployment servers
 application = get_wsgi_application()

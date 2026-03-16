@@ -76,7 +76,7 @@ class AdminUserCreateUpdateSerializer(serializers.ModelSerializer):
     # validate the username field to make sure it stays unique
     def validate_username(self, value):
         queryset = User.objects.filter(username=value)
-
+        
         if self.instance:
             queryset = queryset.exclude(pk=self.instance.pk)
 

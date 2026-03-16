@@ -1,6 +1,8 @@
+# keep the bookings app paths and route names in one place
 class BookingsRoutes:
     APP_NAME = "bookings"
 
+    # relative url paths inside the bookings app
     CREATE_PATH = ""
     MY_LIST_PATH = "my/"
     CANCEL_PATH = "<int:pk>/cancel/"
@@ -8,6 +10,7 @@ class BookingsRoutes:
     APPROVE_PATH = "admin/<int:pk>/approve/"
     REJECT_PATH = "admin/<int:pk>/reject/"
 
+    # short route names used by django reverse
     CREATE_NAME = "booking-create"
     MY_LIST_NAME = "my-bookings"
     CANCEL_NAME = "booking-cancel"
@@ -15,6 +18,7 @@ class BookingsRoutes:
     APPROVE_NAME = "booking-approve"
     REJECT_NAME = "booking-reject"
 
+    # full route names with the app namespace included
     CREATE_FULL_NAME = f"{APP_NAME}:{CREATE_NAME}"
     MY_LIST_FULL_NAME = f"{APP_NAME}:{MY_LIST_NAME}"
     CANCEL_FULL_NAME = f"{APP_NAME}:{CANCEL_NAME}"

@@ -9,7 +9,9 @@ from .models import Building, Equipment, Room
 User = get_user_model()
 
 
+# test the room and building api endpoints
 class RoomAPITests(APITestCase):
+    # create shared users, room data, and urls used by the test cases
     def setUp(self):
         self.buildings_url = reverse(RoomsRoutes.BUILDING_LIST_FULL_NAME)
         self.rooms_url = reverse(RoomsRoutes.ROOM_LIST_FULL_NAME)
@@ -47,6 +49,7 @@ class RoomAPITests(APITestCase):
         )
         self.room.equipment.set([self.equipment1, self.equipment2])
 
+    # public list endpoints should return the current room data
     def test_get_building_list_success(self):
         response = self.client.get(self.buildings_url)
 
@@ -75,6 +78,7 @@ class RoomAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    # only admins can create new rooms
     def test_admin_create_room_success(self):
         self.client.force_authenticate(user=self.admin_user)
 

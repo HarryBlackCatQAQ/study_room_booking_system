@@ -14,7 +14,9 @@ from .models import Review
 User = get_user_model()
 
 
+# test the review api for list and create behavior
 class ReviewAPITests(APITestCase):
+    # create shared users, room data, and bookings used by the test cases
     def setUp(self):
         self.reviews_url = reverse(ReviewsRoutes.LIST_CREATE_FULL_NAME)
 
@@ -76,6 +78,7 @@ class ReviewAPITests(APITestCase):
             comment="Very quiet and good for study.",
         )
 
+    # listing reviews should work without login
     def test_get_all_reviews_success(self):
         response = self.client.get(self.reviews_url)
 
@@ -89,6 +92,7 @@ class ReviewAPITests(APITestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["room"], self.room.id)
 
+    # only finished approved bookings can be reviewed
     def test_create_review_success_for_ended_booking(self):
         self.client.force_authenticate(user=self.student_user)
 
@@ -135,6 +139,7 @@ class ReviewAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Review.objects.count(), 1)
 
+    # creating a review should require login
     def test_create_review_fail_without_authentication(self):
         payload = {
             "booking": self.ended_booking.id,

@@ -37,4 +37,8 @@ urlpatterns = [
 
     # using the api/support/ prefix path for the support urls
     path(ApiPrefix.SUPPORT, include('support.urls')),
+
+    # using the api/smart/ prefix path for the smart services urls (gRPC Java)
+    path(ApiPrefix.SMART, include("smart_services.urls")),
+
 ]

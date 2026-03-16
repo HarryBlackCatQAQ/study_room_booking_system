@@ -294,3 +294,127 @@
     align-items: flex-start;
   }
 }
+
+
+.room-detail-smart {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.room-detail-smart__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.room-detail-smart__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.room-detail-smart__copy {
+  margin-bottom: 0 !important;
+  color: var(--text-muted) !important;
+}
+
+.room-detail-smart__scope {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #dbe6ff;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  font-weight: 700;
+  color: var(--text-strong);
+  white-space: nowrap;
+}
+
+.room-detail-smart__form {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+
+.room-detail-smart__form .ant-form-item {
+  margin-bottom: 0;
+}
+
+.room-detail-smart__action {
+  grid-column: 1 / -1;
+}
+
+.room-detail-smart__submit {
+  height: 46px;
+  border-radius: 14px;
+}
+
+.room-detail-smart__results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.room-detail-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.room-detail-slot__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.room-detail-slot__title {
+  margin: 0 !important;
+}
+
+.room-detail-slot__time {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.room-detail-slot__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.room-detail-smart__empty {
+  padding-top: 4px;
+}
+
+@media (max-width: 1100px) {
+  .room-detail-smart__form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .room-detail-smart__header,
+  .room-detail-slot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .room-detail-smart__form {
+    grid-template-columns: 1fr;
+  }
+}
+

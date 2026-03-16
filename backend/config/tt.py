@@ -1,10 +1,16 @@
+# old route constant file kept as a quick local reference
 class ApiPrefix:
+    # auth endpoints prefix
     AUTH = "api/auth/"
+    # room endpoints prefix
     ROOMS = "api/rooms/"
+    # booking endpoints prefix
     BOOKINGS = "api/bookings/"
+    # review endpoints prefix
     REVIEWS = "api/reviews/"
 
 
+# user route constants
 class UsersRoutes:
     APP_NAME = "users"
 
@@ -24,6 +30,7 @@ class UsersRoutes:
     ME_FULL_NAME = f"{APP_NAME}:{ME_NAME}"
 
 
+# room route constants
 class RoomsRoutes:
     APP_NAME = "rooms"
 
@@ -49,6 +56,7 @@ class RoomsRoutes:
     ADMIN_DELETE_FULL_NAME = f"{APP_NAME}:{ADMIN_DELETE_NAME}"
 
 
+# booking route constants
 class BookingsRoutes:
     APP_NAME = "bookings"
 
@@ -74,6 +82,7 @@ class BookingsRoutes:
     REJECT_FULL_NAME = f"{APP_NAME}:{REJECT_NAME}"
 
 
+# review route constants
 class ReviewsRoutes:
     APP_NAME = "reviews"
 

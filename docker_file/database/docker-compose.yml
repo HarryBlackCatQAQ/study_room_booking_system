@@ -1,4 +1,5 @@
 services:
+  # run one postgres container for the simple local database setup
   postgres:
     image: postgres:16.13
     container_name: studyroom_postgres
@@ -21,4 +22,5 @@ services:
       retries: 5
 
 volumes:
+  # keep postgres data after the container is recreated
   postgres_data:

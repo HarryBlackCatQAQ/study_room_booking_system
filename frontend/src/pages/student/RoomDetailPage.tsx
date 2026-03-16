@@ -15,6 +15,8 @@ import BookingModal from '../../components/booking/BookingModal';
 import LoadingScreen from '../../components/LoadingScreen';
 import type { Review, Room } from '../../types';
 import { formatDateTime } from '../../utils/format';
+import AvailabilitySearchCard from '../../components/room/AvailabilitySearchCard';
+
 
 export default function RoomDetailPage() {
   // Get the room ID from the URL
@@ -254,6 +256,14 @@ export default function RoomDetailPage() {
           </Card>
 
         </div>
+
+        {/* Render a card with smart availability search tools */}
+        <Card className="room-detail-card">
+          <AvailabilitySearchCard room={room} />
+        </Card>
+
+
+
 
         {/* Render a card with room reviews */}
         <Card className="room-detail-card">

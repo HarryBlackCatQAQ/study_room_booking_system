@@ -16,6 +16,8 @@ export default function StudentLayout() {
   return (
     <>
       <BaseLayout items={items} defaultPath="/student" />
+
+      {/* Render the student support chat component (chating with the admin)*/}
       <StudentSupportChat />
     </>
   );

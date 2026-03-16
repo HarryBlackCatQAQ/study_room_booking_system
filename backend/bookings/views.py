@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Booking
 from .serializers import BookingSerializer, BookingCreateSerializer
+from .services import sync_expired_pending_bookings
 from rooms.permissions import IsRoleAdmin
 
 
@@ -25,6 +26,8 @@ class MyBookingListView(generics.ListAPIView):
     # override the get_queryset method to filter the bookings by student 
     # and order them by booking date and start time
     def get_queryset(self):
+        # sync the expired pending bookings before returning the list to the student
+        sync_expired_pending_bookings()
         return Booking.objects.filter(student=self.request.user).order_by('-booking_date', '-start_time')
 
 
@@ -52,10 +55,14 @@ class CancelBookingView(APIView):
 
 # define a view for getting all bookings (admin)
 class AdminBookingListView(generics.ListAPIView):
-    # order the bookings by creation date
-    queryset = Booking.objects.all().order_by('-created_at')
     serializer_class = BookingSerializer
     permission_classes = [IsRoleAdmin]
+
+    # override the get_queryset method to sync the expired pending bookings first
+    def get_queryset(self):
+        # sync the expired pending bookings before returning the admin booking list
+        sync_expired_pending_bookings()
+        return Booking.objects.all().order_by('-created_at')
 
 # define a view for approving a booking (admin)
 class ApproveBookingView(APIView):
@@ -63,12 +70,22 @@ class ApproveBookingView(APIView):
 
     # override the patch method to approve the booking
     def patch(self, request, pk):
+        # sync the expired pending bookings before the admin processes this booking
+        sync_expired_pending_bookings(force=True)
+
         try:
             # get the booking from the database using the primary key
             booking = Booking.objects.get(pk=pk)
         except Booking.DoesNotExist:
             # if the booking does not exist, return a 404 error
             return Response({"detail": "Booking not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # only pending bookings can be approved
+        if booking.status != 'pending':
+            return Response(
+                {"detail": "Only pending bookings can be approved."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # set the booking status to approved
         booking.status = 'approved'

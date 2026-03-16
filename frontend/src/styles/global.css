@@ -1,3 +1,4 @@
+/* load the shared style files used across the whole frontend */
 @import './base/foundation.css';
 @import './layout/shell.css';
 @import './components/guide.css';

@@ -13,7 +13,9 @@ from rooms.models import Building, Room
 User = get_user_model()
 
 
+# test auth, profile, password, and admin user management endpoints
 class UserAPITests(APITestCase):
+    # create shared users, room data, and urls used by the test cases
     def setUp(self):
         self.register_url = reverse(UsersRoutes.REGISTER_FULL_NAME)
         self.login_url = reverse(UsersRoutes.LOGIN_FULL_NAME)
@@ -50,6 +52,7 @@ class UserAPITests(APITestCase):
             building=self.building,
         )
 
+    # register and login endpoints should work for valid credentials
     def test_register_success(self):
         payload = {
             "username": "student1",
@@ -100,6 +103,7 @@ class UserAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    # the profile endpoint should return the current authenticated user
     def test_me_success_with_authentication(self):
         self.client.force_authenticate(user=self.user)
 
@@ -114,6 +118,7 @@ class UserAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    # changing the password should validate the current and new values
     def test_change_password_success(self):
         self.client.force_authenticate(user=self.user)
 
@@ -170,6 +175,7 @@ class UserAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    # admin endpoints should expose user statistics and management actions
     def test_admin_get_user_list_success(self):
         self.client.force_authenticate(user=self.admin_user)
 
@@ -297,6 +303,7 @@ class UserAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["detail"], "You cannot delete the current logged-in admin user.")
 
+    # students must not access the admin user management endpoints
     def test_admin_user_management_fail_for_student(self):
         self.client.force_authenticate(user=self.user)
 

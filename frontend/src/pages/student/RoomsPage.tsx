@@ -1,9 +1,11 @@
-import { Button, Col, Empty, Input, Row, Select, Typography } from 'antd';
+import { Button, Col, Empty, Input, Pagination, Row, Select, Typography } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { getBuildings, getRooms } from '../../api/rooms';
 import RoomCard from '../../components/room/RoomCard';
 import type { Building, Room } from '../../types';
 import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
+import RoomRecommendationPanel from '../../components/room/RoomRecommendationPanel';
+
 
 
 
@@ -15,6 +17,8 @@ export default function RoomsPage() {
   const [search, setSearch] = useState('');
   const [buildingFilter, setBuildingFilter] = useState<number | undefined>();
   const [capacityFilter, setCapacityFilter] = useState<number | undefined>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(9);
 
   // get the data from the api when the page render first time
   useEffect(() => {
@@ -52,6 +56,24 @@ export default function RoomsPage() {
 
   const activeFilterCount = [search, buildingFilter, capacityFilter].filter(Boolean).length;
   const availableRoomsCount = rooms.filter((room) => room.is_active).length;
+  const pageStart = filtered.length ? (currentPage - 1) * pageSize + 1 : 0;
+  const pageEnd = Math.min(currentPage * pageSize, filtered.length);
+
+  const paginatedRooms = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filtered.slice(startIndex, startIndex + pageSize);
+  }, [filtered, currentPage, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, buildingFilter, capacityFilter]);
+
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(filtered.length / pageSize));
+    if (currentPage > maxPage) {
+      setCurrentPage(maxPage);
+    }
+  }, [filtered.length, currentPage, pageSize]);
 
 
 
@@ -100,9 +122,12 @@ export default function RoomsPage() {
           </div>
         </div>
 
+        {/* Display the room recommendation panel */}
+        <RoomRecommendationPanel buildings={buildings} />
 
         {/* Display the filter toolbar */}
         <div className="rooms-toolbar">
+
 
           <div className="rooms-toolbar__controls">
 
@@ -141,9 +166,17 @@ export default function RoomsPage() {
           </div>
 
           <div className="rooms-toolbar__meta">
-            <Typography.Text className="rooms-results">
-              {filtered.length} room{filtered.length === 1 ? '' : 's'} found
-            </Typography.Text>
+            <div className="rooms-toolbar__summary">
+              <Typography.Text className="rooms-results">
+                {filtered.length} room{filtered.length === 1 ? '' : 's'} found
+              </Typography.Text>
+
+              {filtered.length ? (
+                <Typography.Text className="rooms-page-range">
+                  Showing {pageStart}-{pageEnd}
+                </Typography.Text>
+              ) : null}
+            </div>
 
             {hasFilters ? (
               <Button
@@ -163,13 +196,29 @@ export default function RoomsPage() {
 
         {/* Display the filtered rooms */}
         {filtered.length ? (
-          <Row gutter={[20, 20]}>
-            {filtered.map((room) => (
-              <Col xs={24} md={12} xl={8} key={room.id}>
-                <RoomCard room={room} />
-              </Col>
-            ))}
-          </Row>
+          <>
+            <Row gutter={[20, 20]}>
+              {paginatedRooms.map((room) => (
+                <Col xs={24} md={12} xl={8} key={room.id}>
+                  <RoomCard room={room} />
+                </Col>
+              ))}
+            </Row>
+
+            <div className="rooms-pagination">
+              <Pagination
+                current={currentPage}
+                pageSize={pageSize}
+                total={filtered.length}
+                showSizeChanger
+                pageSizeOptions={[9, 12, 18]}
+                onChange={(page, size) => {
+                  setCurrentPage(page);
+                  setPageSize(size);
+                }}
+              />
+            </div>
+          </>
         ) : (
           <div className="rooms-empty">
             <Empty description="No rooms match your current filters" />

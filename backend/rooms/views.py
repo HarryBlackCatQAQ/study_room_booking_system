@@ -85,7 +85,7 @@ class AdminRoomUpdateView(generics.UpdateAPIView):
     serializer_class = RoomCreateUpdateSerializer
     permission_classes = [IsRoleAdmin]
 
-    def perform_create(self, serializer):
+    def perform_update(self, serializer):
         serializer.save()
         # clear the cache when a room is updated
         transaction.on_commit(cache.clear)

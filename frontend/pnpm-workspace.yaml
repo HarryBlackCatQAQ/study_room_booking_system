@@ -1,3 +1,4 @@
+# keep ignored build helpers here so pnpm does not treat them as workspace packages
 ignoredBuiltDependencies:
   - '@parcel/watcher'
   - esbuild

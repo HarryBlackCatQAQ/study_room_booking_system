@@ -6,8 +6,10 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    # point django commands to the main project settings
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
     try:
+        # load django's command runner only when the command starts
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise ImportError(
@@ -15,6 +17,8 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+
+    # pass the terminal arguments to django management
     execute_from_command_line(sys.argv)
 
 

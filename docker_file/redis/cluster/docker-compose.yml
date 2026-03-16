@@ -1,0 +1,288 @@
+services:
+  # run one normal redis instance for channels/pub-sub traffic
+  redis-channel:
+    image: redis:7.4-alpine
+    container_name: studyroom_redis_channel
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-channel.conf
+      - --requirepass
+      - ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_CHANNEL_PORT}:6379"
+    volumes:
+      - ./conf/redis-channel.conf:/usr/local/etc/redis/redis-channel.conf:ro
+      - redis_channel_data:/data
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.28.0.10
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # run cluster node 1 for the sharded cache setup
+  redis-cluster-node-1:
+    image: redis:7.4-alpine
+    container_name: studyroom_redis_cluster_node_1
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7001"
+      - --cluster-announce-hostname
+      - redis-cluster-node-1
+      - --cluster-announce-port
+      - "7001"
+      - --cluster-announce-bus-port
+      - "17001"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_CLUSTER_NODE_1_PORT}:7001"
+    volumes:
+      - ./conf/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_1_data:/data
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.28.0.11
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7001", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # run cluster node 2 for the sharded cache setup
+  redis-cluster-node-2:
+    image: redis:7.4-alpine
+    container_name: studyroom_redis_cluster_node_2
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7002"
+      - --cluster-announce-hostname
+      - redis-cluster-node-2
+      - --cluster-announce-port
+      - "7002"
+      - --cluster-announce-bus-port
+      - "17002"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_CLUSTER_NODE_2_PORT}:7002"
+    volumes:
+      - ./conf/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_2_data:/data
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.28.0.12
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7002", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # run cluster node 3 for the sharded cache setup
+  redis-cluster-node-3:
+    image: redis:7.4-alpine
+    container_name: studyroom_redis_cluster_node_3
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7003"
+      - --cluster-announce-hostname
+      - redis-cluster-node-3
+      - --cluster-announce-port
+      - "7003"
+      - --cluster-announce-bus-port
+      - "17003"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_CLUSTER_NODE_3_PORT}:7003"
+    volumes:
+      - ./conf/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_3_data:/data
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.28.0.13
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7003", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # run cluster node 4 for the sharded cache setup
+  redis-cluster-node-4:
+    image: redis:7.4-alpine
+    container_name: studyroom_redis_cluster_node_4
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7004"
+      - --cluster-announce-hostname
+      - redis-cluster-node-4
+      - --cluster-announce-port
+      - "7004"
+      - --cluster-announce-bus-port
+      - "17004"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_CLUSTER_NODE_4_PORT}:7004"
+    volumes:
+      - ./conf/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_4_data:/data
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.28.0.14
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7004", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # run cluster node 5 for the sharded cache setup
+  redis-cluster-node-5:
+    image: redis:7.4-alpine
+    container_name: studyroom_redis_cluster_node_5
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7005"
+      - --cluster-announce-hostname
+      - redis-cluster-node-5
+      - --cluster-announce-port
+      - "7005"
+      - --cluster-announce-bus-port
+      - "17005"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_CLUSTER_NODE_5_PORT}:7005"
+    volumes:
+      - ./conf/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_5_data:/data
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.28.0.15
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7005", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # run cluster node 6 for the sharded cache setup
+  redis-cluster-node-6:
+    image: redis:7.4-alpine
+    container_name: studyroom_redis_cluster_node_6
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7006"
+      - --cluster-announce-hostname
+      - redis-cluster-node-6
+      - --cluster-announce-port
+      - "7006"
+      - --cluster-announce-bus-port
+      - "17006"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_CLUSTER_NODE_6_PORT}:7006"
+    volumes:
+      - ./conf/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_6_data:/data
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.28.0.16
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7006", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # create the redis cluster after all six nodes are online
+  redis-cluster-init:
+    image: redis:7.4-alpine
+    container_name: studyroom_redis_cluster_init
+    restart: "no"
+    env_file:
+      - .env
+    depends_on:
+      - redis-cluster-node-1
+      - redis-cluster-node-2
+      - redis-cluster-node-3
+      - redis-cluster-node-4
+      - redis-cluster-node-5
+      - redis-cluster-node-6
+    entrypoint:
+      - /bin/sh
+      - /scripts/create-cluster.sh
+    volumes:
+      - ./scripts/create-cluster.sh:/scripts/create-cluster.sh:ro
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.28.0.30
+
+volumes:
+  # keep data for the channel redis instance
+  redis_channel_data:
+  # keep data for cluster node 1
+  redis_cluster_node_1_data:
+  # keep data for cluster node 2
+  redis_cluster_node_2_data:
+  # keep data for cluster node 3
+  redis_cluster_node_3_data:
+  # keep data for cluster node 4
+  redis_cluster_node_4_data:
+  # keep data for cluster node 5
+  redis_cluster_node_5_data:
+  # keep data for cluster node 6
+  redis_cluster_node_6_data:
+
+networks:
+  # use a fixed subnet so every redis node keeps a stable cluster address
+  redis_cluster_net:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24

@@ -48,3 +48,13 @@ export type {
     SupportMessagePage,
     SupportMessagePayload
 } from './support';
+
+
+
+// Import the types from the smart booking tools
+export type {
+    RecommendationRequestPayload,
+    RecommendedRoom,
+    AvailabilityRequestPayload,
+    AvailableSlot
+} from './smart';

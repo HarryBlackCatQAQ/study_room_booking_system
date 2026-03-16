@@ -1,6 +1,8 @@
+# keep the users app paths and route names in one place
 class UsersRoutes:
     APP_NAME = "users"
 
+    # public and authenticated user paths
     REGISTER_PATH = "register/"
     LOGIN_PATH = "login/"
     REFRESH_PATH = "refresh/"
@@ -11,6 +13,7 @@ class UsersRoutes:
     ADMIN_UPDATE_PATH = "admin/<int:pk>/update/"
     ADMIN_DELETE_PATH = "admin/<int:pk>/delete/"
 
+    # short route names used by django reverse
     REGISTER_NAME = "register"
     LOGIN_NAME = "login"
     REFRESH_NAME = "token_refresh"
@@ -21,6 +24,7 @@ class UsersRoutes:
     ADMIN_UPDATE_NAME = "admin-user-update"
     ADMIN_DELETE_NAME = "admin-user-delete"
 
+    # full route names with the app namespace included
     REGISTER_FULL_NAME = f"{APP_NAME}:{REGISTER_NAME}"
     LOGIN_FULL_NAME = f"{APP_NAME}:{LOGIN_NAME}"
     REFRESH_FULL_NAME = f"{APP_NAME}:{REFRESH_NAME}"

@@ -46,6 +46,28 @@ def get_env_list(name, default=None):
     return [item.strip() for item in raw_value.split(",") if item.strip()]
 
 
+def get_env_bool(name, default=False):
+    raw_value = os.getenv(name)
+
+    if raw_value is None:
+        return default
+
+    return raw_value.lower() in {"1", "true", "yes", "on"}
+
+
+def build_postgres_database_config(host, port):
+    return {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": host,
+        "PORT": port,
+        "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "60")),
+        "CONN_HEALTH_CHECKS": get_env_bool("DB_CONN_HEALTH_CHECKS", True),
+    }
+
+
 ALLOWED_HOSTS = get_env_list(
     "ALLOWED_HOSTS",
     ["127.0.0.1", "localhost"],
@@ -56,6 +78,14 @@ CORS_ALLOWED_ORIGINS = get_env_list(
     "CORS_ALLOWED_ORIGINS",
     ["http://localhost:5173"],
 )
+CSRF_TRUSTED_ORIGINS = get_env_list("CSRF_TRUSTED_ORIGINS", [])
+USE_X_FORWARDED_HOST = get_env_bool("USE_X_FORWARDED_HOST", False)
+SECURE_SSL_REDIRECT = get_env_bool("SECURE_SSL_REDIRECT", False)
+SESSION_COOKIE_SECURE = get_env_bool("SESSION_COOKIE_SECURE", False)
+CSRF_COOKIE_SECURE = get_env_bool("CSRF_COOKIE_SECURE", False)
+
+if get_env_bool("USE_SECURE_PROXY_SSL_HEADER", False):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Application definition
 
@@ -78,6 +108,7 @@ INSTALLED_APPS = [
     'bookings',
     'reviews',
     'support',
+    'smart_services',
 ]
 
 MIDDLEWARE = [
@@ -89,6 +120,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'config.middleware.DatabaseRoutingMiddleware',
+    'config.middleware.ApiRequestLogMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -115,6 +148,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 DB_ENGINE = os.getenv("DB_ENGINE", "sqlite")
+DB_READ_REPLICA_ALIASES = ()
+DATABASE_ROUTERS = []
+DB_FORCE_PRIMARY_FOR_UNSAFE_METHODS = get_env_bool("DB_FORCE_PRIMARY_FOR_UNSAFE_METHODS", True)
 
 # Using sqlite in the local environment
 # Using postgresql in the production environment
@@ -127,15 +163,27 @@ if DB_ENGINE == "sqlite":
     }
 else:
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT"),
-        }
+        "default": build_postgres_database_config(
+            os.getenv("DB_HOST"),
+            os.getenv("DB_PORT"),
+        )
     }
+
+    replica_hosts = get_env_list("DB_READ_REPLICA_HOSTS")
+    replica_ports = get_env_list("DB_READ_REPLICA_PORTS")
+
+    replica_aliases = []
+
+    for index, replica_host in enumerate(replica_hosts, start=1):
+        replica_alias = f"replica_{index}"
+        replica_port = replica_ports[index - 1] if index - 1 < len(replica_ports) else os.getenv("DB_PORT")
+        DATABASES[replica_alias] = build_postgres_database_config(replica_host, replica_port)
+        replica_aliases.append(replica_alias)
+
+    DB_READ_REPLICA_ALIASES = tuple(replica_aliases)
+
+    if DB_READ_REPLICA_ALIASES:
+        DATABASE_ROUTERS = ['config.database.router.PrimaryReplicaRouter']
 
 
 # Password validation
@@ -172,7 +220,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+# keep a concrete static files directory available for dockerized nginx deployments
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -206,24 +257,87 @@ SIMPLE_JWT = {
 }
 
 
-
-
 REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:5013/1")
+REDIS_CHANNEL_URL = os.getenv("REDIS_CHANNEL_URL", REDIS_URL)
+REDIS_CHANNEL_HOSTS = get_env_list("REDIS_CHANNEL_HOSTS", [REDIS_CHANNEL_URL])
+REDIS_CLUSTER_ENABLED = get_env_bool("REDIS_CLUSTER_ENABLED", False)
+REDIS_CLUSTER_NODES = get_env_list("REDIS_CLUSTER_NODES")
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": REDIS_URL,
-        "TIMEOUT": 300,
-        "KEY_PREFIX": "study_room_booking_system",
+if REDIS_CLUSTER_ENABLED and REDIS_CLUSTER_NODES:
+    CACHES = {
+        "default": {
+            "BACKEND": "config.cache.redis_cluster.RedisClusterCache",
+            "LOCATION": REDIS_CLUSTER_NODES,
+            "TIMEOUT": 300,
+            "KEY_PREFIX": "study_room_booking_system",
+            "OPTIONS": {
+                "read_from_replicas": get_env_bool("REDIS_CLUSTER_READ_FROM_REPLICAS", True),
+                "require_full_coverage": get_env_bool("REDIS_CLUSTER_REQUIRE_FULL_COVERAGE", True),
+                "address_remap": os.getenv("REDIS_CLUSTER_ADDRESS_REMAP", ""),
+            },
+        }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+            "TIMEOUT": 300,
+            "KEY_PREFIX": "study_room_booking_system",
+        }
+    }
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [REDIS_URL],
+            "hosts": REDIS_CHANNEL_HOSTS,
         },
     }
+}
+
+JAVA_RECOMMENDATION_GRPC_TARGET = os.getenv("JAVA_RECOMMENDATION_GRPC_TARGET", "localhost:50061")
+GO_AVAILABILITY_GRPC_TARGET = os.getenv("GO_AVAILABILITY_GRPC_TARGET", "localhost:50062")
+JAVA_BOOKING_LIFECYCLE_GRPC_TARGET = os.getenv(
+    "JAVA_BOOKING_LIFECYCLE_GRPC_TARGET",
+    JAVA_RECOMMENDATION_GRPC_TARGET,
+)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "timestamped": {
+            "format": "[{asctime}] {levelname} {name}: {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "timestamped",
+        },
+    },
+    "loggers": {
+        "django.server": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "api.access": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
 }
