@@ -21,7 +21,7 @@ from config.routes import ApiPrefix
 
 urlpatterns = [
     # add the url for the admin, using the admin.site from django
-    path('admin/', admin.site.urls),
+    path('manage/', admin.site.urls),
 
     # using the api/auth/ prefix path for the users urls
     path(ApiPrefix.AUTH, include('users.urls')),

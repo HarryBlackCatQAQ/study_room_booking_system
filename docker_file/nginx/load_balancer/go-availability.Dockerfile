@@ -29,7 +29,7 @@ WORKDIR /app
 COPY --from=builder /build/bin/go-availability-service /app/go-availability-service
 
 # document the internal grpc listening port used by django containers
-EXPOSE 50062
+EXPOSE 5102
 
 # start the go grpc service when the container launches
 CMD ["/app/go-availability-service"]

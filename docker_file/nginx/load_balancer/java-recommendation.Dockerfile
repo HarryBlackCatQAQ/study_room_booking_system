@@ -34,7 +34,7 @@ WORKDIR /app
 COPY --from=builder /build/services/java-recommendation-service/target/*.jar /app/java-recommendation-service.jar
 
 # document the internal grpc listening port used by django containers
-EXPOSE 50061
+EXPOSE 5101
 
 # start the spring boot grpc service when the container launches
 CMD ["java", "-jar", "/app/java-recommendation-service.jar"]

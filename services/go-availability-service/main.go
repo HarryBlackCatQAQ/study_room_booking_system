@@ -26,7 +26,7 @@ func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
 
 	// listen on the grpc port used by the django smart availability view.
-	lis, err := net.Listen("tcp", ":50062")
+	lis, err := net.Listen("tcp", ":5102")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -36,7 +36,7 @@ func main() {
 	pb.RegisterAvailabilityServiceServer(server, &availabilityServer{})
 	reflection.Register(server)
 
-	log.Println("Go Availability gRPC server is running on :50062")
+	log.Println("Go Availability gRPC server is running on :5102")
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

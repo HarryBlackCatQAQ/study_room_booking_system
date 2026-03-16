@@ -58,8 +58,8 @@ docker compose down
 - Django admin through nginx: `http://127.0.0.1:8088/admin/`
 - API through nginx: `http://127.0.0.1:8088/api/`
 - WebSocket through nginx: `ws://127.0.0.1:8088/ws/support/student/`
-- Internal Java gRPC service: `java-recommendation-service:50061`
-- Internal Go gRPC service: `go-availability-service:50062`
+- Internal Java gRPC service: `java-recommendation-service:5101`
+- Internal Go gRPC service: `go-availability-service:5102`
 
 ## 8. Validation ideas
 

@@ -43,7 +43,7 @@ services:
       - studyroom_lb_net
     # keep the grpc port internal to the docker network because nginx does not proxy grpc in this stack
     expose:
-      - "50061"
+      - "5101"
 
   # start the go grpc availability service used by django smart availability flows
   go-availability-service:
@@ -62,7 +62,7 @@ services:
       - studyroom_lb_net
     # keep the grpc port internal to the docker network because nginx does not proxy grpc in this stack
     expose:
-      - "50062"
+      - "5102"
 
   # run the one-time django initialization work before the replicated app containers start
   backend-init:
