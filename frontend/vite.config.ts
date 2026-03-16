@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
       ? {
           // allow external access in the public mode
           host: '0.0.0.0',
-          allowedHosts: ['it5012.ttz3305012.uk'],
+          allowedHosts: ['ttz3305012.uk', 'www.ttz3305012.uk'],
         }
       : {
           // keep local development bound to localhost
