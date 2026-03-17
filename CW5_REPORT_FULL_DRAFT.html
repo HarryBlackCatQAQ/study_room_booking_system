@@ -1,0 +1,330 @@
+<!DOCTYPE html><html><head>
+      <title>CW5_REPORT_FULL_DRAFT</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:////Users/mac/.vscode/extensions/shd101wyy.markdown-preview-enhanced-0.8.21/crossnote/dependencies/katex/katex.min.css">
+      
+      
+      
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script>
+    </head>
+    <body for="html-export">
+      <div class="crossnote markdown-preview  ">
+      
+<h1 id="study-room-booking-system">Study Room Booking System </h1>
+<h2 id="cw5-web-application-implementation-report">CW5 Web Application Implementation Report </h2>
+<p>Team AA<br>
+Course: COMPSCI5012 Internet Technology</p>
+<hr>
+<h2 id="1-introduction-repository-link-and-deployed-application-url">1. Introduction, Repository Link and Deployed Application URL </h2>
+<h3 id="11-project-overview">1.1 Project Overview </h3>
+<p>The Study Room Booking System is a web-based application that allows university students to search for study rooms and submit booking requests through an online platform. The aim of the system is to make study room reservation more efficient, organised, and transparent for both students and administrators.</p>
+<p>Students can browse rooms and view important information such as building, location, capacity, and equipment. After choosing a suitable room, they can submit a booking request by selecting a date and a time range. The system stores these booking records and allows students to view their current bookings, booking history, and completed sessions that are eligible for review.</p>
+<p>The system also includes an administrator interface. Administrators can review booking requests, approve or reject them, and manage core resource data such as rooms, buildings, equipment, and user accounts. This supports better control of room usage and reduces booking conflicts.</p>
+<p>Overall, the application provides a practical and user-friendly platform for managing study room reservations while also supporting administrative oversight and system maintenance.</p>
+<h3 id="12-adjustments-made-to-the-original-design-specification">1.2 Adjustments Made to the Original Design Specification </h3>
+<p>The final implementation follows the main direction of the original design specification, but several adjustments were made during development to improve usability and better support the implemented workflow.</p>
+<p>The most important change concerns booking processing. In the implemented system, a booking submitted by a student is first stored with the status <strong>Pending</strong> rather than being immediately confirmed. An administrator must then review the request and decide whether to approve or reject it. This change makes the workflow more realistic and helps prevent scheduling conflicts.</p>
+<p>Another change concerns authentication. In the original design, separate login paths were considered for students and administrators. In the final implementation, both roles use a single login interface. After login, the system checks the role of the authenticated user and redirects the user to the appropriate dashboard automatically.</p>
+<p>The interface design was also refined compared with the original wireframes. The final system uses a clearer navigation structure, more informative dashboards, status tags for bookings, and dedicated management pages for buildings, equipment, and user accounts. These changes improved clarity and usability while keeping the core design consistent with the original specification.</p>
+<h3 id="13-code-repository-link">1.3 Code Repository Link </h3>
+<p>Public code repository:<br>
+<code>https://github.com/HarryBlackCatQAQ/study_room_booking_system.git</code></p>
+<h3 id="14-deployed-web-application-url">1.4 Deployed Web Application URL </h3>
+<p>Public deployed application:<br>
+<code>http://ttz3305012.uk</code></p>
+<hr>
+<h2 id="2-updated-design-specification">2. Updated Design Specification </h2>
+<h3 id="21-system-overview">2.1 System Overview </h3>
+<p>The Study Room Booking System supports two main user roles: <strong>students</strong> and <strong>administrators</strong>.</p>
+<p>Students use the system to browse rooms, view room details, submit booking requests, track booking status, cancel bookings when necessary, and review completed bookings. The student side of the platform is designed to support the complete booking journey, from room discovery to booking history.</p>
+<p>Administrators use the system to review booking requests and manage the system’s core data. This includes maintaining room records, building information, equipment lists, and user accounts. The administrator interface is designed to support day-to-day management tasks in a structured and efficient way.</p>
+<p>The final system therefore combines a student-facing booking workflow with a role-protected administration interface, allowing both room users and system managers to interact with the same platform in different ways.</p>
+<h3 id="22-user-stories">2.2 User Stories </h3>
+<p>The updated implementation is based on the following prioritised user stories from the original design specification.</p>
+<p><strong>Must have</strong></p>
+<ul>
+<li><strong>M1:</strong> As a student, I want to log in and register, so that my bookings are private and linked to my account.</li>
+<li><strong>M2:</strong> As a student, I want to browse rooms by capacity, location, and equipment, and see real-time availability, so that I can find a suitable space.</li>
+<li><strong>M3:</strong> As a student, I want to book a study room by selecting a date, start time, and end time, so that I can reserve a specific time slot for studying.</li>
+<li><strong>M4:</strong> As a student, I want to view my upcoming bookings, so that I can keep track of when and where I have reserved a room. Additionally, I want to see the history of my booking.</li>
+<li><strong>M5:</strong> As an administrator, I want to manage room details (add / edit / delete), so that the room list is always up-to-date.</li>
+<li><strong>M6:</strong> As an administrator, I want to approve or reject bookings, so that I can control access to restricted resources.</li>
+</ul>
+<p><strong>Should have</strong></p>
+<ul>
+<li><strong>S1:</strong> As a student, I want to cancel a booking, so that the room becomes available if my plans change.</li>
+<li><strong>S2:</strong> As an administrator, I want to view a dashboard of active reservations, so that I can monitor daily room usage.</li>
+</ul>
+<p><strong>Could have</strong></p>
+<ul>
+<li><strong>C1:</strong> As a student, I want to rate rooms, so that other students know which rooms are good.</li>
+</ul>
+<p><strong>Won’t have</strong></p>
+<ul>
+<li><strong>W1:</strong> As a student, I want to integrate with my university calendar, so that bookings sync automatically.</li>
+</ul>
+<h3 id="23-system-architecture-diagram">2.3 System Architecture Diagram </h3>
+<p><strong>[Insert Figure 1: Updated System Architecture Diagram]</strong></p>
+<p>Figure 1 shows the high-level architecture of the implemented system. The frontend is a React single-page application built with Vite and TypeScript. It communicates with a Django backend through REST API endpoints. Django handles authentication, role-based access control, room management, booking workflows, review submission, and administrative operations.</p>
+<p>In addition to the main Django service, the system also includes two gRPC-based supporting services. A Java service is used for room recommendation, while a Go service is used for room availability checking. These services are accessed by Django and exposed to the frontend through API endpoints. The implementation also includes caching for selected API responses and a Docker-based deployment configuration with Nginx as the public entry point.</p>
+<p>This architecture is more advanced than a simple two-tier web application while still meeting the coursework requirement that the core backend be implemented using Python and Django.</p>
+<h3 id="24-data-design">2.4 Data Design </h3>
+<p><strong>[Insert Figure 2: Final ER Diagram]</strong></p>
+<p>The implemented system uses a relational data model centred around six main entities: <strong>User</strong>, <strong>Building</strong>, <strong>Equipment</strong>, <strong>Room</strong>, <strong>Booking</strong>, and <strong>Review</strong>.</p>
+<p>The <strong>User</strong> model extends Django’s authentication system and includes a <code>role</code> field to distinguish between students and administrators. A <strong>Building</strong> can contain multiple <strong>Room</strong> records, and a <strong>Room</strong> can be linked to multiple <strong>Equipment</strong> items. A <strong>Booking</strong> connects a student user to a room and stores the booking date, time range, status, and the administrator who processed the request. A <strong>Review</strong> allows a student to submit a rating and comment for a completed approved booking.</p>
+<p>This data design supports the full workflow of authentication, room browsing, booking submission, booking approval, cancellation, and review posting while keeping the model structure consistent with the implemented system.</p>
+<h3 id="25-site-structure">2.5 Site Structure </h3>
+<p><strong>[Insert Figure 3: Site Map]</strong></p>
+<p>The site structure is organised around role-based navigation.</p>
+<p>On the student side, users can access the landing page, login and registration pages, student dashboard, room browsing page, room detail page, my bookings page, booking history page, and profile page.</p>
+<p>On the administrator side, authenticated admin users can access the admin dashboard, booking request management page, room management page, building management page, equipment management page, user management page, and profile page.</p>
+<p>This structure keeps the student journey simple while also separating administrative tasks into focused management pages.</p>
+<h3 id="26-user-interface-design">2.6 User Interface Design </h3>
+<p><strong>[Insert Figure 4: Wireframes / Key UI Screens]</strong></p>
+<p>The early wireframes were used as the basis for the final interface design. They guided the layout of the login page, dashboard pages, room browsing interface, booking forms, and administrator management pages.</p>
+<p>During implementation, the wireframes were refined into a more polished and consistent interface using reusable layouts, dashboard cards, status tags, form components, and responsive page sections. The final interface remains aligned with the design intention of the original specification while providing a more complete and usable user experience.</p>
+<h3 id="27-changes-from-the-original-design-specification">2.7 Changes from the Original Design Specification </h3>
+<p>Although the implemented system follows the original design closely, several changes were made during development.</p>
+<h4 id="271-authentication-interface-change">2.7.1 Authentication Interface Change </h4>
+<p>In the original design, separate login interfaces were considered for students and administrators. In the final implementation, this was simplified into a single login page. After successful authentication, the system checks the role of the user and redirects them to the correct dashboard automatically.</p>
+<p>This change simplified the login process and reduced unnecessary duplication in the interface.</p>
+<p><strong>[Insert Figure 5: Implemented Login Interface]</strong></p>
+<h4 id="272-student-interface-improvements">2.7.2 Student Interface Improvements </h4>
+<p>Compared with the original wireframes, the final student interface provides more guidance and more visible system feedback.</p>
+<p>The student dashboard now presents booking-related summary information, quick access actions, and guidance for common tasks. The room browsing interface includes filters, search, and room suggestion features. The booking history page also supports the review workflow for completed sessions.</p>
+<p>These additions make the student interface more informative and easier to use than the original draft design.</p>
+<p><strong>[Insert Figure 6: Implemented Student Dashboard]</strong></p>
+<h4 id="273-administrative-system-expansion">2.7.3 Administrative System Expansion </h4>
+<p>The administrative interface was expanded beyond the original wireframes. In addition to booking approval and room management, the final implementation includes dedicated pages for managing buildings, equipment, and user accounts.</p>
+<p>These additions make the system more complete from an administrative perspective and provide better support for maintaining study room resources and user data.</p>
+<p><strong>[Insert Figure 7: Implemented Administrative Interface]</strong></p>
+<hr>
+<h2 id="3-implementation-highlights">3. Implementation Highlights </h2>
+<h3 id="31-system-architecture">3.1 System Architecture </h3>
+<p>The final system uses a separated frontend and backend architecture.</p>
+<p>The frontend is implemented as a React single-page application using <strong>React</strong>, <strong>Vite</strong>, <strong>TypeScript</strong>, <strong>React Router</strong>, <strong>Axios</strong>, and <strong>Ant Design</strong>. This frontend is responsible for rendering the user interface, handling client-side routing, validating user input, and performing asynchronous API requests.</p>
+<p>The backend is implemented using <strong>Django</strong> and <strong>Django REST Framework</strong>. It provides the application’s main business logic, API endpoints, database interaction, role-based permissions, and authentication features. Authentication is handled using JWT tokens so that protected API endpoints can be accessed securely from the frontend.</p>
+<p>Beyond the core Django backend, the project also includes two supporting services. A <strong>Java gRPC service</strong> provides room recommendation functionality, and a <strong>Go gRPC service</strong> provides availability searching for requested time ranges. These services are called by Django and exposed to the frontend through API endpoints.</p>
+<h3 id="32-main-components">3.2 Main Components </h3>
+<p>The implemented system contains the following main components:</p>
+<ul>
+<li><strong>Frontend application:</strong> student and administrator interfaces built with React.</li>
+<li><strong>Authentication module:</strong> registration, login, profile, and password change endpoints.</li>
+<li><strong>Room management module:</strong> room listing, room detail, room creation, update, and deletion.</li>
+<li><strong>Booking module:</strong> booking creation, booking listing, cancellation, approval, and rejection.</li>
+<li><strong>Review module:</strong> room review listing and review submission after completed approved bookings.</li>
+<li><strong>Administrative management module:</strong> building, equipment, and user account management.</li>
+<li><strong>Smart services module:</strong> room recommendation and availability search via gRPC-integrated backend endpoints.</li>
+</ul>
+<p>Each major feature is separated into reusable pages, API modules, backend apps, serializers, and service layers, which helps keep the implementation organised and maintainable.</p>
+<h3 id="33-key-features">3.3 Key Features </h3>
+<p><strong>User Authentication (M1)</strong><br>
+User authentication is implemented using Django-based backend logic and JWT authentication for API access. Students and administrators can register and log in, and the system redirects authenticated users to the correct dashboard according to their role.</p>
+<p><strong>Room Browsing (M2)</strong><br>
+Students can browse rooms on the room listing page and view room details such as building, location, capacity, and equipment. The interface also supports filtering and searching to help users find a suitable room more quickly.</p>
+<p><strong>Room Booking (M3)</strong><br>
+Students can submit a booking request by choosing a room, date, start time, and end time. The backend validates the request and prevents overlapping bookings.</p>
+<p><strong>Booking Tracking and History (M4)</strong><br>
+Students can view their current booking requests and booking history. The history page also allows completed approved bookings to be reviewed.</p>
+<p><strong>Room Management (M5)</strong><br>
+Administrators can create, update, and delete room records through dedicated management pages.</p>
+<p><strong>Booking Approval (M6)</strong><br>
+Administrators can review booking requests and approve or reject them. Approved and rejected requests are recorded with status updates.</p>
+<p>In addition to the core must-have requirements, the final system also includes booking cancellation, room reviews, building management, equipment management, user management, room recommendation, and availability checking.</p>
+<h3 id="34-front-end-interactivity">3.4 Front-end Interactivity </h3>
+<p>The application clearly demonstrates client-side interactivity beyond static page rendering.</p>
+<p>The React frontend provides dynamic room filtering and pagination, form validation, asynchronous API requests, role-based route protection, and live interface updates after user actions such as login, booking creation, or request approval. The booking forms, login forms, and management forms all validate required input before submission.</p>
+<p>The system also includes two interactive smart features. The room recommendation interface submits form data asynchronously and displays suggested rooms based on the selected criteria. The availability checking interface allows users to query a time range and immediately view available rooms without requiring a full page reload.</p>
+<p>These behaviours provide clear evidence that the application meets the coursework requirement for frontend interactivity.</p>
+<h3 id="35-look-and-feel">3.5 Look and Feel </h3>
+<p>The interface was designed to be polished, consistent, and responsive.</p>
+<p>The project uses Ant Design components together with custom CSS for layouts, forms, cards, tables, navigation, status displays, and page sections. Shared layout components are used for both student and administrator views, helping the system maintain a consistent visual language.</p>
+<p>The colour palette, spacing, typography, and dashboard layout were designed to make the interface more refined than the original wireframes. Responsive CSS is also used so that major pages, particularly authentication and dashboard layouts, adapt to smaller screens. As a result, the final application provides a more professional and coherent user experience.</p>
+<h3 id="36-code-quality-and-organisation">3.6 Code Quality and Organisation </h3>
+<p>The codebase is organised to support separation of concerns and reusability.</p>
+<p>On the frontend, routing, API access, reusable components, page components, styles, and utility functions are separated into different modules. On the backend, functionality is divided into dedicated Django apps including users, rooms, bookings, reviews, and smart services.</p>
+<p>Reusable serializers, API client modules, and shared layout components reduce duplication and make the code easier to maintain. API configuration is also kept separate from page code so that frontend requests are not hard-coded directly inside UI components. This structure helps the implementation satisfy the coursework expectations for readable and well-organised code.</p>
+<hr>
+<h2 id="4-testing">4. Testing </h2>
+<p>Testing was carried out using a combination of automated API tests and manual browser-based testing.</p>
+<p>The automated tests were implemented using Django REST Framework’s testing tools. These tests focus on important business rules and API behaviour across the authentication, booking, room, and review modules.</p>
+<p>The automated test suite covers the following areas:</p>
+<ul>
+<li>user registration and login</li>
+<li>invalid login handling</li>
+<li>profile retrieval and password change</li>
+<li>room list and room detail retrieval</li>
+<li>admin room creation permissions</li>
+<li>booking creation</li>
+<li>booking conflict prevention</li>
+<li>booking cancellation</li>
+<li>admin booking approval and rejection</li>
+<li>auto-rejection of expired pending bookings</li>
+<li>review creation rules</li>
+<li>restrictions on reviewing incomplete or already reviewed bookings</li>
+<li>administrative user management behaviour</li>
+</ul>
+<p>The automated tests were run on <strong>17 March 2026</strong> using the following command:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code>./.venv/bin/python backend/manage.py <span class="token builtin class-name">test</span> bookings reviews <span class="token function">users</span> rooms smart_services
+</code></pre><p>The result was:</p>
+<pre data-role="codeBlock" data-info="text" class="language-text text"><code>Ran 42 tests in 90.226s
+OK
+</code></pre><p>In addition to the automated tests, manual testing was used to verify the complete user journey in the browser. This included logging in, browsing rooms, submitting a booking request, approving or rejecting a booking as an administrator, viewing booking history, and submitting a room review after a completed booking.</p>
+<p>Together, these automated and manual checks provide evidence that the implemented system behaves correctly for the main coursework requirements.</p>
+<p><strong>[Insert Figure 8: Screenshot of automated test output]</strong></p>
+<hr>
+<h2 id="5-accessibility-report">5. Accessibility Report </h2>
+<p>The accessibility plan created during the design phase was applied to the final system through several practical interface improvements. The improvements were mainly implemented on the login page, booking-related forms, and other important user input flows.</p>
+<h3 id="51-keyboard-accessibility">5.1 Keyboard Accessibility </h3>
+<p>The system supports keyboard-based interaction for important user tasks. Users can move through form fields, buttons, and links using the keyboard, and actions such as login and booking submission can be completed without relying on a mouse.</p>
+<p>This improves usability for keyboard-only users and supports more accessible interaction across the interface.</p>
+<p><strong>[Insert Figure 9: Screenshot showing keyboard navigation or focused element]</strong></p>
+<h3 id="52-visible-focus-indicators">5.2 Visible Focus Indicators </h3>
+<p>Visible focus styling was added so that users can clearly see which interactive element is currently selected when navigating by keyboard. Buttons, input fields, select components, and date/time pickers all display a clear focus outline.</p>
+<p>This change directly supports the accessibility plan by making keyboard navigation easier to follow.</p>
+<p><strong>[Insert Figure 10: Screenshot showing visible focus outline]</strong></p>
+<h3 id="53-clear-labels-and-input-guidance">5.3 Clear Labels and Input Guidance </h3>
+<p>Forms across the system use clear labels and supporting guidance. For example, the login page includes labelled fields for <strong>Username</strong> and <strong>Password</strong>, and the booking form includes labelled fields for <strong>Date</strong>, <strong>Start Time</strong>, and <strong>End Time</strong>. Some fields also include placeholders or validation messages to help users understand what information is expected.</p>
+<p>This reduces user error and improves accessibility for users who need clearer form semantics.</p>
+<p><strong>[Insert Figure 11: Screenshot showing labelled login or booking form]</strong></p>
+<h3 id="54-summary">5.4 Summary </h3>
+<p>These improvements show that the accessibility plan was applied in the implemented system rather than remaining only at the design stage. The changes focus on practical usability improvements that are visible in the final user interface and supported by evidence from key pages.</p>
+<hr>
+<h2 id="6-sustainability-report">6. Sustainability Report </h2>
+<p>The sustainability-related performance of the application was evaluated using <strong>Google Lighthouse</strong>. The evaluation focused on user-facing pages because the coursework brief requires performance evidence for at least two pages, including the homepage and one core feature page.</p>
+<h3 id="61-tool-and-pages-tested">6.1 Tool and Pages Tested </h3>
+<p>The following pages were tested on <strong>17 March 2026</strong>:</p>
+<ul>
+<li>Homepage: <code>http://ttz3305012.uk/</code></li>
+<li>Login page: <code>http://ttz3305012.uk/login</code></li>
+</ul>
+<p>These pages were selected because they are public entry points to the application and represent important user-facing parts of the system.</p>
+<h3 id="62-baseline-measurement">6.2 Baseline Measurement </h3>
+<p>The baseline Lighthouse results were:</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th style="text-align:right">Performance</th>
+<th style="text-align:right">Accessibility</th>
+<th style="text-align:right">Best Practices</th>
+<th style="text-align:right">SEO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Homepage</td>
+<td style="text-align:right">46</td>
+<td style="text-align:right">98</td>
+<td style="text-align:right">78</td>
+<td style="text-align:right">83</td>
+</tr>
+<tr>
+<td>Login page</td>
+<td style="text-align:right">40</td>
+<td style="text-align:right">94</td>
+<td style="text-align:right">78</td>
+<td style="text-align:right">82</td>
+</tr>
+</tbody>
+</table>
+<p>The baseline results showed that accessibility was already relatively strong, but performance was weaker. The main issue identified by Lighthouse was the size of the frontend JavaScript bundle. For example, Lighthouse estimated unused JavaScript savings of approximately <strong>1,098 KiB</strong> on the homepage and <strong>1,039 KiB</strong> on the login page.</p>
+<h3 id="63-changes-implemented">6.3 Changes Implemented </h3>
+<p>To improve sustainability-related performance, the frontend should be optimised to reduce the amount of JavaScript loaded during the initial page load. Suitable implemented changes include:</p>
+<ul>
+<li>introducing route-level code splitting for page components</li>
+<li>reducing unnecessary JavaScript in the initial bundle</li>
+<li>reducing unused CSS where possible</li>
+<li>keeping frequently requested room and building endpoints cached</li>
+</ul>
+<p><strong>Important:</strong> this subsection must describe only the changes that were actually implemented in the final submitted version. If additional optimisation work is completed before submission, this paragraph should be updated to reflect the exact changes made.</p>
+<h3 id="64-after-measurement-and-reflection">6.4 After Measurement and Reflection </h3>
+<p>After implementing the performance improvements, Lighthouse should be run again on the same two pages and the updated results should be reported below.</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th style="text-align:right">Performance Before</th>
+<th style="text-align:right">Performance After</th>
+<th style="text-align:right">Accessibility Before</th>
+<th style="text-align:right">Accessibility After</th>
+<th style="text-align:right">Best Practices Before</th>
+<th style="text-align:right">Best Practices After</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Homepage</td>
+<td style="text-align:right">46</td>
+<td style="text-align:right"><strong>[Fill in]</strong></td>
+<td style="text-align:right">98</td>
+<td style="text-align:right"><strong>[Fill in]</strong></td>
+<td style="text-align:right">78</td>
+<td style="text-align:right"><strong>[Fill in]</strong></td>
+</tr>
+<tr>
+<td>Login page</td>
+<td style="text-align:right">40</td>
+<td style="text-align:right"><strong>[Fill in]</strong></td>
+<td style="text-align:right">94</td>
+<td style="text-align:right"><strong>[Fill in]</strong></td>
+<td style="text-align:right">78</td>
+<td style="text-align:right"><strong>[Fill in]</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Suggested reflection text after you fill in the real values:</p>
+<p>The main improvement came from reducing the amount of frontend code that needed to be processed during the initial page load. After optimisation, the tested pages loaded more efficiently, which improved the performance score and reduced unnecessary resource usage. Accessibility remained strong because the optimisation work focused mainly on bundle size and page delivery rather than changing form semantics or navigation behaviour.</p>
+<p><strong>[Insert Figure 12: Lighthouse baseline screenshot]</strong><br>
+<strong>[Insert Figure 13: Lighthouse after-optimisation screenshot]</strong></p>
+<hr>
+<h2 id="7-appendix-team-contributions-and-ai-use-statement">7. Appendix: Team Contributions and AI Use Statement </h2>
+<h3 id="71-team-contributions">7.1 Team Contributions </h3>
+<ul>
+<li><strong>Haorong Huang</strong> – Database design and system architecture (34%)</li>
+<li><strong>Haozhe Zhang</strong> – User stories and system overview (33%)</li>
+<li><strong>Enyang Tu</strong> – Sitemap, wireframes, and accessibility design (33%)</li>
+</ul>
+<h3 id="72-ai-use-statement">7.2 AI Use Statement </h3>
+<p>Declaration on the use of Generative AI:</p>
+<ul>
+<li>We declare that we have used GenAI for copy-editing and improving the clarity of language in the report.</li>
+<li>We declare that we have used GenAI for limited debugging support, code-quality suggestions, test ideas, and guidance on accessibility and sustainability reporting.</li>
+</ul>
+<p>Tool(s) used: ChatGPT<br>
+Parts affected: report drafting/editing, report structure, debugging guidance, testing ideas, accessibility guidance, and sustainability interpretation.<br>
+How correctness was ensured: we checked the final report against the coursework brief, verified the report content against our own codebase, and validated implementation details through builds, tests, and manual review before submission.</p>
+<hr>
+<h2 id="final-notes-before-exporting-to-pdf">Final Notes Before Exporting to PDF </h2>
+<ul>
+<li>Replace all figure placeholders with real screenshots or diagrams.</li>
+<li>Keep the section page limits in mind when transferring this draft into Word.</li>
+<li>Do not claim any sustainability improvement as implemented unless it was actually implemented and re-measured.</li>
+<li>If the ER diagram still shows entities not present in the final code, update it before submission.</li>
+</ul>
+
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+  
+    </body></html>
