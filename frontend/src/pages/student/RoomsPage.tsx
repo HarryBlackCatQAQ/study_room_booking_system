@@ -92,10 +92,6 @@ export default function RoomsPage() {
               Browse Rooms
             </Typography.Title>
 
-            <Typography.Paragraph className="rooms-hero__copy">
-              Compare rooms by location, building, capacity, and available equipment before opening the detail page.
-            </Typography.Paragraph>
-
             <div className="rooms-hero__pills">
               <span className="rooms-hero__pill">{availableRoomsCount} active rooms</span>
               <span className="rooms-hero__pill">{buildings.length} buildings</span>

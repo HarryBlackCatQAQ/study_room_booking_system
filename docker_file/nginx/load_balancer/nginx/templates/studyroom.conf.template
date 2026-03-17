@@ -1,145 +1,55 @@
-# keep one upstream pool for all replicated django asgi application servers
+# django backend upstream
 upstream studyroom_backend_pool {
-    # keep least_conn enabled so long-lived websocket sessions do not overload one backend
     least_conn;
-
-    # keep the first backend replica in the upstream pool
     server ${BACKEND_UPSTREAM_SERVER_1} max_fails=3 fail_timeout=30s;
-
-    # keep the second backend replica in the upstream pool
     server ${BACKEND_UPSTREAM_SERVER_2} max_fails=3 fail_timeout=30s;
-
-    # keep the third backend replica in the upstream pool
     server ${BACKEND_UPSTREAM_SERVER_3} max_fails=3 fail_timeout=30s;
-
-    # keep a shared keepalive pool for repeated proxied requests
     keepalive 32;
 }
 
 server {
-    # keep nginx listening on the standard container http port
     listen 80;
-
-    # accept host requests regardless of the browser host header value
     server_name _;
 
-    # keep a lightweight nginx-only health endpoint for docker health checks
+    # nginx health check
     location = /nginx-healthz {
-        # keep health checks out of the main access log noise
         access_log off;
-
-        # keep the response content type explicit for debugging
         add_header Content-Type text/plain;
-
-        # keep the health response simple and deterministic
         return 200 'ok';
     }
 
-    # serve collected django static files directly from nginx instead of proxying them
+    # django static files
     location /static/ {
-        # keep the backend static volume mounted under a stable filesystem path
         alias /var/www/backend-static/;
-
-        # keep browser caching enabled for static assets
         expires 1h;
-
-        # keep cache-control headers explicit for static responses
         add_header Cache-Control "public";
     }
 
-    # proxy django admin traffic through the backend pool
+    # django admin
     location /admin/ {
-        # keep the backend pool as the proxy target
         proxy_pass http://studyroom_backend_pool;
-
-        # keep http/1.1 enabled for upstream keepalive support
         proxy_http_version 1.1;
-
-        # preserve the original host header for django allowed-host validation
         proxy_set_header Host $host;
-
-        # preserve the client ip chain for backend access logging
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-
-        # preserve the original client ip for backend access logging
         proxy_set_header X-Real-IP $remote_addr;
-
-        # preserve the original scheme for downstream logic and logs
         proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
-
-        # keep upstream retries enabled for transient backend failures
         proxy_next_upstream error timeout http_502 http_503 http_504;
     }
 
-    # proxy all restful api traffic through the backend pool
+    # api traffic
     location /api/ {
-        # keep the backend pool as the proxy target
         proxy_pass http://studyroom_backend_pool;
-
-        # keep http/1.1 enabled for upstream keepalive support
         proxy_http_version 1.1;
-
-        # preserve the original host header for django allowed-host validation
         proxy_set_header Host $host;
-
-        # preserve the client ip chain for backend access logging
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-
-        # preserve the original client ip for backend access logging
         proxy_set_header X-Real-IP $remote_addr;
-
-        # preserve the original scheme for downstream logic and logs
         proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
-
-        # keep upstream retries enabled for transient backend failures
         proxy_next_upstream error timeout http_502 http_503 http_504;
     }
 
-    # proxy websocket traffic through the same backend pool
-    location /ws/ {
-        # keep the backend pool as the websocket proxy target
-        proxy_pass http://studyroom_backend_pool;
-
-        # keep http/1.1 enabled because websocket upgrades require it
-        proxy_http_version 1.1;
-
-        # preserve the original host header for django allowed-host validation
-        proxy_set_header Host $host;
-
-        # preserve the client ip chain for backend access logging
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-
-        # preserve the original client ip for backend access logging
-        proxy_set_header X-Real-IP $remote_addr;
-
-        # preserve the original scheme for downstream logic and logs
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
-
-        # upgrade the proxied connection to websocket when the browser requests it
-        proxy_set_header Upgrade $http_upgrade;
-
-        # keep the connection header aligned with the upgrade map from nginx.conf
-        proxy_set_header Connection $connection_upgrade;
-
-        # keep websocket sessions alive for long-running support chat connections
-        proxy_read_timeout 3600s;
-
-        # keep websocket sessions alive for long-running support chat connections
-        proxy_send_timeout 3600s;
-
-        # keep buffering disabled so websocket frames are forwarded immediately
-        proxy_buffering off;
-
-        # keep upstream retries enabled for transient backend failures before the upgrade happens
-        proxy_next_upstream error timeout http_502 http_503 http_504;
-    }
-
-    # serve the built react single-page application for all non-api browser routes
+    # frontend app
     location / {
-        # keep the built frontend assets under the default nginx html directory
         root /usr/share/nginx/html;
-
-        # serve the exact file when present and fall back to index.html for client-side routing
         try_files $uri $uri/ /index.html;
     }
 }

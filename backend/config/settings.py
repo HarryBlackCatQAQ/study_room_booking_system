@@ -96,7 +96,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'daphne',
-    'channels',
     'django.contrib.staticfiles',
 
     'corsheaders',
@@ -107,7 +106,6 @@ INSTALLED_APPS = [
     'rooms',
     'bookings',
     'reviews',
-    'support',
     'smart_services',
 ]
 
@@ -258,8 +256,6 @@ SIMPLE_JWT = {
 
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:5013/1")
-REDIS_CHANNEL_URL = os.getenv("REDIS_CHANNEL_URL", REDIS_URL)
-REDIS_CHANNEL_HOSTS = get_env_list("REDIS_CHANNEL_HOSTS", [REDIS_CHANNEL_URL])
 REDIS_CLUSTER_ENABLED = get_env_bool("REDIS_CLUSTER_ENABLED", False)
 REDIS_CLUSTER_NODES = get_env_list("REDIS_CLUSTER_NODES")
 
@@ -286,15 +282,6 @@ else:
             "KEY_PREFIX": "study_room_booking_system",
         }
     }
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": REDIS_CHANNEL_HOSTS,
-        },
-    }
-}
 
 JAVA_RECOMMENDATION_GRPC_TARGET = os.getenv("JAVA_RECOMMENDATION_GRPC_TARGET", "localhost:5101")
 GO_AVAILABILITY_GRPC_TARGET = os.getenv("GO_AVAILABILITY_GRPC_TARGET", "localhost:5102")

@@ -23,6 +23,8 @@ export default function BookingRequestsPage() {
 
       // set bookings
       setBookings(data);
+    } catch {
+      message.error('Failed to load booking requests');
     } finally {
       // set loading to false
       setLoading(false);
@@ -84,10 +86,6 @@ export default function BookingRequestsPage() {
             Booking Requests
           </Typography.Title>
 
-          <Typography.Paragraph className="records-hero__desc">
-            Review student requests, approve valid bookings, and reject requests that cannot be fulfilled.
-          </Typography.Paragraph>
-
           <div className="records-pills">
             <span className="records-pill">{bookings.length} total requests</span>
             <span className="records-pill">{pendingCount} pending</span>
@@ -117,10 +115,6 @@ export default function BookingRequestsPage() {
         <div className="records-toolbar__content">
           <Typography.Text className="records-toolbar__title">
             Approval request list
-          </Typography.Text>
-
-          <Typography.Text className="records-toolbar__meta">
-            {bookings.length} request{bookings.length === 1 ? '' : 's'} loaded
           </Typography.Text>
         </div>
       </div>

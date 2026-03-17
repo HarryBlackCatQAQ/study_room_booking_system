@@ -193,10 +193,6 @@ export default function UserManagementPage() {
             User Management
           </Typography.Title>
 
-          <Typography.Paragraph className="records-hero__desc">
-            Create, edit, and maintain student and admin accounts without leaving the admin workspace.
-          </Typography.Paragraph>
-
           <div className="records-pills">
             <span className="records-pill">{users.length} total users</span>
             <span className="records-pill">{adminCount} admin</span>
@@ -226,10 +222,6 @@ export default function UserManagementPage() {
         <div className="records-toolbar__content">
           <Typography.Text className="records-toolbar__title">
             Manage user records
-          </Typography.Text>
-
-          <Typography.Text className="records-toolbar__meta">
-            {users.length} account{users.length === 1 ? '' : 's'} loaded in the current list
           </Typography.Text>
         </div>
 

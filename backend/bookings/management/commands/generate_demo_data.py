@@ -9,7 +9,6 @@ from django.utils import timezone
 from bookings.models import Booking
 from reviews.models import Review
 from rooms.models import Building, Equipment, Room
-from support.models import SupportConversation, SupportMessage
 from users.models import User
 
 
@@ -27,8 +26,6 @@ TARGETS = {
     "rooms": 78,
     "bookings": 680,
     "reviews": 260,
-    "support_conversations": 54,
-    "support_messages": 320,
 }
 
 # first names used when building demo student accounts
@@ -110,7 +107,7 @@ LAST_NAMES = [
 ADMIN_SPECS = [
     ("admin_ops_01", "Campus", "Operations"),
     ("admin_rooms_02", "Megan", "Stewart"),
-    ("admin_support_03", "Daniel", "McLean"),
+    ("admin_spaces_03", "Daniel", "McLean"),
     ("admin_services_04", "Priya", "Patel"),
     ("admin_review_05", "Oliver", "Fraser"),
     ("admin_facilities_06", "Chloe", "Murray"),
@@ -226,59 +223,6 @@ REVIEW_DETAILS = {
     ],
 }
 
-# support chat topic pairs used to build demo conversations
-SUPPORT_TOPICS = [
-    {
-        "student": [
-            "I cannot find a quiet room near the library for tomorrow afternoon.",
-            "Could someone recommend a room with a screen for a group meeting?",
-            "I need help finding a room for a revision session later this week.",
-        ],
-        "admin": [
-            "I checked the current room list and there are still several available options nearby.",
-            "You should be able to filter for larger rooms with display equipment on the rooms page.",
-            "I have reviewed the inventory and there are suitable spaces available for that time window.",
-        ],
-    },
-    {
-        "student": [
-            "My approved booking is not showing clearly in my booking list.",
-            "I received an approval earlier but I want to confirm the room and time again.",
-            "Could you help me verify whether my reservation is still active?",
-        ],
-        "admin": [
-            "I checked the booking record and the reservation is still active in the system.",
-            "Please refresh the page and the booking should appear with the latest status.",
-            "The booking is valid and the room remains assigned to your request.",
-        ],
-    },
-    {
-        "student": [
-            "The room I used today did not have the equipment I expected.",
-            "The equipment list for this room seems different from what I saw onsite.",
-            "Could the equipment details for this room be checked?",
-        ],
-        "admin": [
-            "I have flagged the room record for an equipment review.",
-            "The facilities team has been asked to verify the listed equipment.",
-            "We will update the equipment information if anything is inaccurate.",
-        ],
-    },
-    {
-        "student": [
-            "I need a slightly larger room for a project meeting next week.",
-            "Can my current request be compared with other rooms that fit more students?",
-            "I am looking for another room with more seats and a whiteboard.",
-        ],
-        "admin": [
-            "There are a few larger rooms with similar equipment available in the next booking window.",
-            "I can suggest rooms with higher capacity if your group size has changed.",
-            "The admin team can review the options and point you to similar rooms.",
-        ],
-    },
-]
-
-
 class Command(BaseCommand):
     help = "Generate realistic demo data directly into the configured database."
 
@@ -299,7 +243,6 @@ class Command(BaseCommand):
             rooms, room_created = self.ensure_rooms(rng, buildings, equipment)
             bookings_created = self.ensure_bookings(rng, students, admins, rooms)
             reviews_created = self.ensure_reviews(rng)
-            conversations_created, messages_created = self.ensure_support_data(rng, students, admins)
 
         summary = {
             "users": User.objects.count(),
@@ -310,8 +253,6 @@ class Command(BaseCommand):
             "rooms": Room.objects.count(),
             "bookings": Booking.objects.count(),
             "reviews": Review.objects.count(),
-            "support_conversations": SupportConversation.objects.count(),
-            "support_messages": SupportMessage.objects.count(),
         }
 
         self.stdout.write(self.style.SUCCESS("Demo data generation completed for the configured database."))
@@ -321,8 +262,6 @@ class Command(BaseCommand):
         self.stdout.write(f"Generated rooms: {room_created}")
         self.stdout.write(f"Generated bookings: {bookings_created}")
         self.stdout.write(f"Generated reviews: {reviews_created}")
-        self.stdout.write(f"Generated support conversations: {conversations_created}")
-        self.stdout.write(f"Generated support messages: {messages_created}")
         self.stdout.write(f"Generated account password: {password}")
         self.stdout.write(self.style.SUCCESS(f"Current totals: {summary}"))
 
@@ -621,149 +560,6 @@ class Command(BaseCommand):
             created += 1
 
         return created
-
-    # create support conversations and messages for the demo accounts
-    def ensure_support_data(self, rng, students, admins):
-        conversations = list(
-            SupportConversation.objects.select_related("student", "assigned_admin").order_by("id")
-        )
-        messages_before = SupportMessage.objects.count()
-        conversation_created = 0
-        open_student_ids = set(
-            SupportConversation.objects.filter(status="open").values_list("student_id", flat=True)
-        )
-
-        while len(conversations) < TARGETS["support_conversations"]:
-            student = rng.choice(students)
-            wants_open = rng.random() < 0.22 and student.id not in open_student_ids
-            status = "open" if wants_open else "closed"
-            if wants_open:
-                open_student_ids.add(student.id)
-
-            assigned_admin = rng.choice(admins) if status == "closed" or rng.random() < 0.72 else None
-            created_at = self.random_past_datetime(
-                rng,
-                min_days=2 if status == "open" else 10,
-                max_days=28 if status == "open" else 120,
-            )
-
-            conversation = SupportConversation.objects.create(
-                student=student,
-                assigned_admin=assigned_admin,
-                status=status,
-            )
-            SupportConversation.objects.filter(pk=conversation.pk).update(
-                created_at=created_at,
-                updated_at=created_at,
-                last_message_at=created_at,
-            )
-
-            conversation.created_at = created_at
-            conversation.updated_at = created_at
-            conversation.last_message_at = created_at
-            conversations.append(conversation)
-            conversation_created += 1
-
-        target_new_messages = TARGETS["support_messages"] - messages_before
-        if target_new_messages <= 0:
-            return conversation_created, 0
-
-        conversation_pool = conversations[-conversation_created:] if conversation_created else conversations
-        if not conversation_pool:
-            return conversation_created, 0
-
-        message_plan = self.build_message_plan(target_new_messages, len(conversation_pool), rng)
-        messages_created = 0
-
-        for conversation, message_count in zip(conversation_pool, message_plan):
-            if message_count <= 0:
-                continue
-
-            topic = rng.choice(SUPPORT_TOPICS)
-            last_created_at = conversation.created_at
-            assigned_admin = conversation.assigned_admin
-
-            for index in range(message_count):
-                sender_role = "student" if index % 2 == 0 else "admin"
-                if sender_role == "admin":
-                    if assigned_admin is None:
-                        assigned_admin = rng.choice(admins)
-                        SupportConversation.objects.filter(pk=conversation.pk).update(
-                            assigned_admin=assigned_admin
-                        )
-                        conversation.assigned_admin = assigned_admin
-                    sender = assigned_admin
-                else:
-                    sender = conversation.student
-
-                content_pool = topic["student"] if sender_role == "student" else topic["admin"]
-                content = content_pool[index % len(content_pool)]
-
-                message = SupportMessage.objects.create(
-                    conversation=conversation,
-                    sender=sender,
-                    content=content,
-                    is_read_by_student=True,
-                    is_read_by_admin=True,
-                )
-
-                last_created_at = min(
-                    timezone.now() - timedelta(minutes=1),
-                    last_created_at + timedelta(minutes=rng.randint(5, 360)),
-                )
-                is_last = index == message_count - 1
-                is_read_by_student = True
-                is_read_by_admin = True
-
-                if conversation.status == "open" and is_last:
-                    if sender_role == "student":
-                        is_read_by_admin = False
-                    else:
-                        is_read_by_student = False
-
-                SupportMessage.objects.filter(pk=message.pk).update(
-                    created_at=last_created_at,
-                    is_read_by_student=is_read_by_student,
-                    is_read_by_admin=is_read_by_admin,
-                )
-                messages_created += 1
-
-            SupportConversation.objects.filter(pk=conversation.pk).update(
-                assigned_admin=assigned_admin,
-                last_message_at=last_created_at,
-                updated_at=last_created_at,
-            )
-
-        return conversation_created, messages_created
-
-    # decide how many messages each support conversation should contain
-    def build_message_plan(self, total_messages, conversation_count, rng):
-        plan = [0] * conversation_count
-        indices = list(range(conversation_count))
-        rng.shuffle(indices)
-
-        for index in indices:
-            if total_messages <= 0:
-                break
-            if total_messages >= 2:
-                plan[index] = 2
-                total_messages -= 2
-            else:
-                plan[index] = 1
-                total_messages -= 1
-
-        while total_messages > 0:
-            eligible = [index for index, count in enumerate(plan) if 0 < count < 8]
-            if not eligible:
-                eligible = [index for index, count in enumerate(plan) if count < 8]
-            if not eligible:
-                break
-
-            index = rng.choice(eligible)
-            plan[index] += 1
-            total_messages -= 1
-
-        return plan
 
     # build one review comment from the rating and room details
     def build_review_comment(self, rating, room, rng):

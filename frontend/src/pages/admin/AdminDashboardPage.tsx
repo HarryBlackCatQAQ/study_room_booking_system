@@ -28,7 +28,6 @@ export default function AdminDashboardPage() {
   const pendingCount = bookings.filter((booking) => booking.status === 'pending').length;
   const approvedCount = bookings.filter((booking) => booking.status === 'approved').length;
   const activeRoomsCount = rooms.filter((room) => room.is_active).length;
-
   const adminFocusMessage = getadminFocuseMessage(pendingCount);
 
   return (
@@ -44,7 +43,6 @@ export default function AdminDashboardPage() {
           <Typography.Paragraph className="dashboard-hero__copy">
             Review room inventory, check pending approvals, and monitor campus booking activity from one place.
           </Typography.Paragraph>
-
         </div>
 
         {/* Statistics for the admin */}
@@ -54,9 +52,6 @@ export default function AdminDashboardPage() {
           <Col xs={24} sm={12} xl={6}>
             <Card className="stat-card">
               <Statistic title="Total rooms" value={rooms.length} prefix={<HomeOutlined />} />
-              <Typography.Text className="stat-card__hint">
-                All rooms currently stored in the system.
-              </Typography.Text>
             </Card>
           </Col>
 
@@ -64,9 +59,6 @@ export default function AdminDashboardPage() {
           <Col xs={24} sm={12} xl={6}>
             <Card className="stat-card">
               <Statistic title="Active rooms" value={activeRoomsCount} prefix={<AppstoreOutlined />} />
-              <Typography.Text className="stat-card__hint">
-                Rooms currently available for booking.
-              </Typography.Text>
             </Card>
           </Col>
 
@@ -74,9 +66,6 @@ export default function AdminDashboardPage() {
           <Col xs={24} sm={12} xl={6}>
             <Card className="stat-card">
               <Statistic title="Pending bookings" value={pendingCount} prefix={<ClockCircleOutlined />} />
-              <Typography.Text className="stat-card__hint">
-                Requests that still need admin review.
-              </Typography.Text>
             </Card>
           </Col>
 
@@ -84,9 +73,6 @@ export default function AdminDashboardPage() {
           <Col xs={24} sm={12} xl={6}>
             <Card className="stat-card">
               <Statistic title="Approved bookings" value={approvedCount} prefix={<CheckCircleOutlined />} />
-              <Typography.Text className="stat-card__hint">
-                Reservations already approved in the system.
-              </Typography.Text>
             </Card>
           </Col>
 
@@ -94,13 +80,9 @@ export default function AdminDashboardPage() {
 
         <div className="dashboard-grid">
           <Card className="dashboard-section-card">
-            <Typography.Title level={4} className="dashboard-section-title">
+            <Typography.Title level={3} className="dashboard-section-title">
               Review checklist
             </Typography.Title>
-
-            <Typography.Paragraph>
-              The top cards already cover the numbers. This section is for admin workflow priorities.
-            </Typography.Paragraph>
 
             <div className="guide-list">
               <div className="guide-item">
@@ -127,7 +109,7 @@ export default function AdminDashboardPage() {
 
               <div className="guide-item">
                 <div className="guide-item__header">
-                  <Typography.Text className="guide-item__title">Maintain supporting data</Typography.Text>
+                  <Typography.Text className="guide-item__title">Maintain reference data</Typography.Text>
                   <span className="guide-item__badge">Buildings / Equipment</span>
                 </div>
 
@@ -193,9 +175,7 @@ export default function AdminDashboardPage() {
       </div>
     </>
   );
-
 }
-
 
 function getadminFocuseMessage(pendingCount: number){
   const adminFocusMessage = pendingCount > 0

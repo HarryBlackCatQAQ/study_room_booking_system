@@ -48,13 +48,7 @@ export default function BaseLayout({items, defaultPath}: BaseLayoutProps) {
                       Navigation
                     </Typography.Text>
 
-                    <Menu
-                      mode="inline"
-                      selectedKeys={selected ? [selected] : []}
-                      items={items}
-                      onClick={handleMenuClick}
-                      className="app-shell__menu"
-                    />
+                    <Menu mode="inline" selectedKeys={selected ? [selected] : []} items={items} onClick={handleMenuClick} className="app-shell__menu"/>
 
                     {/* Render a footer action for quick profile access */}
                     <div className="app-shell__nav-footer">

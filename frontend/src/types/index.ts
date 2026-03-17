@@ -40,17 +40,6 @@ export type {
     EquipmentPayload
 } from './room';
 
-// Import the types from the support chat
-export type {
-    SupportConversation,
-    SupportConversationSummary,
-    SupportMessage,
-    SupportMessagePage,
-    SupportMessagePayload
-} from './support';
-
-
-
 // Import the types from the smart booking tools
 export type {
     RecommendationRequestPayload,

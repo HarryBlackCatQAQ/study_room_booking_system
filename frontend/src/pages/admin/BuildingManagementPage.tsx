@@ -115,10 +115,6 @@ export default function BuildingManagementPage() {
             Building Management
           </Typography.Title>
 
-          <Typography.Paragraph className="records-hero__desc">
-            Keep building names, campus areas, and opening hours aligned with the real campus layout.
-          </Typography.Paragraph>
-
           <div className="records-pills">
             <span className="records-pill">{buildings.length} buildings</span>
             <span className="records-pill">{campusAreaCount} campus areas</span>
@@ -147,10 +143,6 @@ export default function BuildingManagementPage() {
         <div className="records-toolbar__content">
           <Typography.Text className="records-toolbar__title">
             Manage campus buildings
-          </Typography.Text>
-
-          <Typography.Text className="records-toolbar__meta">
-            {campusAreaCount} campus area{campusAreaCount === 1 ? '' : 's'} linked to these records
           </Typography.Text>
         </div>
 

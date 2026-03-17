@@ -28,7 +28,7 @@ class PrimaryReplicaRouter:
         if model._meta.app_label in PRIMARY_ONLY_APP_LABELS:
             return DEFAULT_DB_ALIAS
 
-        # Keep non-request workloads such as websocket consumers and management commands on the primary database.
+        # Keep non-request workloads such as management commands on the primary database.
         if not is_database_routing_context_active():
             return DEFAULT_DB_ALIAS
 

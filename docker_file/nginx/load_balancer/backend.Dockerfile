@@ -11,7 +11,7 @@ WORKDIR /app
 # copy the backend dependency manifest first so docker layer caching works well
 COPY backend/requirements.txt /tmp/requirements.txt
 
-# install the backend python dependencies used by django, daphne, channels, and grpc
+# install the backend python dependencies used by django, daphne, and grpc
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # copy the full django backend source code into the container image

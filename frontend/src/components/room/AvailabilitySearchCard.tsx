@@ -5,9 +5,6 @@ import {
   DatePicker,
   Empty,
   Form,
-  InputNumber,
-  Select,
-  Tag,
   TimePicker,
   Typography,
   message,
@@ -29,14 +26,11 @@ interface Props {
   room: Room;
 }
 
-// Form values interface for the availability search form
+// Form values interface for the availability form
 interface AvailabilityFormValues {
   booking_date: Dayjs;
   search_start_time: Dayjs;
   search_end_time: Dayjs;
-  duration_minutes: number;
-  min_capacity: number;
-  required_equipment?: string[];
 }
 
 // helper function to get a readable error message from the api response
@@ -64,10 +58,10 @@ export default function AvailabilitySearchCard({ room }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  // submit the availability search form and load matching slots
+  // submit the availability form and load matching rooms
   const handleFinish = async (values: AvailabilityFormValues) => {
     if (!values.search_end_time.isAfter(values.search_start_time)) {
-      message.error('Search end time must be later than search start time.');
+      message.error('End time must be later than start time.');
       return;
     }
 
@@ -75,10 +69,7 @@ export default function AvailabilitySearchCard({ room }: Props) {
       booking_date: values.booking_date.format('YYYY-MM-DD'),
       search_start_time: values.search_start_time.format('HH:mm:ss'),
       search_end_time: values.search_end_time.format('HH:mm:ss'),
-      duration_minutes: values.duration_minutes,
-      min_capacity: values.min_capacity,
       building_id: room.building?.id,
-      required_equipment: values.required_equipment || [],
     };
 
     setSubmitting(true);
@@ -88,7 +79,7 @@ export default function AvailabilitySearchCard({ room }: Props) {
       setResults(data);
       setSearched(true);
     } catch (error) {
-      message.error(getSmartErrorMessage(error, 'Failed to search available slots.'));
+      message.error(getSmartErrorMessage(error, 'Failed to check room availability.'));
     } finally {
       setSubmitting(false);
     }
@@ -104,11 +95,11 @@ export default function AvailabilitySearchCard({ room }: Props) {
           </Typography.Text>
 
           <Typography.Title level={4} className="room-detail-card__title">
-            Smart availability search
+            Availability check
           </Typography.Title>
 
           <Typography.Paragraph className="room-detail-smart__copy">
-            Search matching time slots in the same building as this room.
+            Check which rooms in this building are free for your selected time range.
           </Typography.Paragraph>
         </div>
 
@@ -122,10 +113,10 @@ export default function AvailabilitySearchCard({ room }: Props) {
       <Alert
         showIcon
         type="info"
-        message="This search is scoped to the current building. You can narrow it further with equipment and minimum capacity."
+        message="Search one exact time range in this building and see the rooms without booking conflicts."
       />
 
-      {/* Render the availability search form */}
+      {/* Render the availability form */}
       <Form
         form={form}
         layout="vertical"
@@ -133,11 +124,8 @@ export default function AvailabilitySearchCard({ room }: Props) {
         onFinish={handleFinish}
         initialValues={{
           booking_date: dayjs().add(1, 'day'),
-          search_start_time: dayjs().hour(8).minute(0).second(0),
-          search_end_time: dayjs().hour(18).minute(0).second(0),
-          duration_minutes: 60,
-          min_capacity: room.capacity,
-          required_equipment: [],
+          search_start_time: dayjs().hour(9).minute(0).second(0),
+          search_end_time: dayjs().hour(10).minute(0).second(0),
         }}
       >
         {/* Form item for selecting the booking date */}
@@ -152,62 +140,25 @@ export default function AvailabilitySearchCard({ room }: Props) {
           />
         </Form.Item>
 
-        {/* Form item for selecting the search start time */}
+        {/* Form item for selecting the start time */}
         <Form.Item
-          label="Search start time"
+          label="Start time"
           name="search_start_time"
-          rules={[{ required: true, message: 'Please select a search start time' }]}
+          rules={[{ required: true, message: 'Please select a start time' }]}
         >
           <TimePicker style={{ width: '100%' }} format="HH:mm" minuteStep={30} />
         </Form.Item>
 
-        {/* Form item for selecting the search end time */}
+        {/* Form item for selecting the end time */}
         <Form.Item
-          label="Search end time"
+          label="End time"
           name="search_end_time"
-          rules={[{ required: true, message: 'Please select a search end time' }]}
+          rules={[{ required: true, message: 'Please select an end time' }]}
         >
           <TimePicker style={{ width: '100%' }} format="HH:mm" minuteStep={30} />
         </Form.Item>
 
-        {/* Form item for selecting the duration */}
-        <Form.Item
-          label="Duration"
-          name="duration_minutes"
-          rules={[{ required: true, message: 'Please select a duration' }]}
-        >
-          <Select
-            options={[30, 60, 90, 120, 150, 180].map((value) => ({
-              label: `${value} minutes`,
-              value,
-            }))}
-          />
-        </Form.Item>
-
-        {/* Form item for setting the minimum capacity */}
-        <Form.Item
-          label="Minimum capacity"
-          name="min_capacity"
-          rules={[{ required: true, message: 'Please enter the minimum capacity' }]}
-        >
-          <InputNumber style={{ width: '100%' }} min={1} />
-        </Form.Item>
-
-        {/* Form item for matching the current room equipment */}
-        <Form.Item label="Match equipment" name="required_equipment">
-          <Select
-            mode="multiple"
-            allowClear
-            placeholder={room.equipment.length ? 'Optional' : 'No equipment listed for this room'}
-            disabled={!room.equipment.length}
-            options={room.equipment.map((item) => ({
-              label: item.name,
-              value: item.name,
-            }))}
-          />
-        </Form.Item>
-
-        {/* Form item for submitting the availability search */}
+        {/* Form item for submitting the availability form */}
         <Form.Item className="room-detail-smart__action">
           <Button
             type="primary"
@@ -215,7 +166,7 @@ export default function AvailabilitySearchCard({ room }: Props) {
             loading={submitting}
             className="room-detail-smart__submit"
           >
-            Search available slots
+            Check availability
           </Button>
         </Form.Item>
       </Form>
@@ -226,12 +177,12 @@ export default function AvailabilitySearchCard({ room }: Props) {
           <Alert
             showIcon
             type="info"
-            message="Submit the form to scan matching time slots."
+            message="Submit the form to check room availability for the selected time."
           />
         </>
       ) : results.length ? (
         <>
-          {/* Display the matching slots after a successful search */}
+          {/* Display the matching rooms after a successful search */}
           <div className="room-detail-smart__results">
             {results.map((item, index) => (
               <article
@@ -255,7 +206,7 @@ export default function AvailabilitySearchCard({ room }: Props) {
                 {/* Display the current room flag and the navigation action */}
                 <div className="room-detail-slot__actions">
                   {item.room_id === room.id ? (
-                    <Tag color="blue">Current room</Tag>
+                    <span className="guide-item__badge">Current room</span>
                   ) : null}
 
                   <Button
@@ -271,9 +222,9 @@ export default function AvailabilitySearchCard({ room }: Props) {
         </>
       ) : (
         <>
-          {/* Show an empty state when no matching slots are found */}
+          {/* Show an empty state when no matching rooms are found */}
           <div className="room-detail-smart__empty">
-            <Empty description="No matching time slots were found." />
+            <Empty description="No free rooms were found for this exact time range." />
           </div>
         </>
       )}

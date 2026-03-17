@@ -1,5 +1,5 @@
 services:
-  # run the writable primary postgres node
+  # primary database
   postgres-primary:
     image: bitnami/postgresql:latest
     container_name: studyroom_postgres_primary
@@ -25,7 +25,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # run the first read replica and replicate data from the primary node
+  # read replica 1
   postgres-replica-1:
     image: bitnami/postgresql:latest
     container_name: studyroom_postgres_replica_1
@@ -54,7 +54,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # run the second read replica and replicate data from the primary node
+  # read replica 2
   postgres-replica-2:
     image: bitnami/postgresql:latest
     container_name: studyroom_postgres_replica_2
@@ -84,9 +84,7 @@ services:
       retries: 10
 
 volumes:
-  # keep database files for the primary node
+  # postgres data
   postgres_primary_data:
-  # keep database files for the first replica
   postgres_replica_1_data:
-  # keep database files for the second replica
   postgres_replica_2_data:

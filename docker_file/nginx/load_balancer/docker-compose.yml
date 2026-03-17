@@ -1,172 +1,125 @@
-# keep shared backend image configuration in one reusable anchor
+# shared django backend settings
 x-backend-common: &backend-common
-  # build the django backend image from the repository root
+  # backend image
   build:
-    # keep the build context at the repository root so docker can see the backend source tree
     context: ../../..
-    # keep the backend dockerfile inside the nginx load balancer deployment folder
     dockerfile: docker_file/nginx/load_balancer/backend.Dockerfile
-  # keep the local load balancer environment variables available inside each backend container
+  # backend env file
   env_file:
     - .env
-  # keep shared backend container settings in one place
   environment:
-    # keep dockerized grpc calls able to reach host-side services when needed
     PYTHONUNBUFFERED: "1"
-  # keep the backend static files on a shared named volume so nginx can serve them
+  # collected static files
   volumes:
     - backend_static_data:/app/staticfiles
-  # keep the backend containers on the load balancer, postgres, and redis networks
+  # app, db, and redis networks
   networks:
     - studyroom_lb_net
     - postgres_cluster_net
     - redis_cluster_net
-  # keep host.docker.internal resolvable for grpc services and other host-side integrations
+  # allow host.docker.internal
   extra_hosts:
     - "host.docker.internal:host-gateway"
 
 services:
-  # start the java grpc recommendation service used by django smart recommendation and booking lifecycle flows
+  # java service
   java-recommendation-service:
-    # build the java grpc service image from the repository root
     build:
-      # keep the build context at the repository root so docker can see the shared proto folder
       context: ../../..
-      # keep the java service dockerfile inside the nginx load balancer deployment folder
       dockerfile: docker_file/nginx/load_balancer/java-recommendation.Dockerfile
-    # keep the java service container name explicit for docker inspection and logs
     container_name: studyroom_java_recommendation_service
-    # keep the grpc service alive across docker daemon restarts
     restart: unless-stopped
-    # keep the java service on the shared application network so django containers can call it by service name
     networks:
       - studyroom_lb_net
-    # keep the grpc port internal to the docker network because nginx does not proxy grpc in this stack
     expose:
       - "5101"
 
-  # start the go grpc availability service used by django smart availability flows
+  # go service
   go-availability-service:
-    # build the go grpc service image from the repository root
     build:
-      # keep the build context at the repository root so docker can see the go service source tree
       context: ../../..
-      # keep the go service dockerfile inside the nginx load balancer deployment folder
       dockerfile: docker_file/nginx/load_balancer/go-availability.Dockerfile
-    # keep the go service container name explicit for docker inspection and logs
     container_name: studyroom_go_availability_service
-    # keep the grpc service alive across docker daemon restarts
     restart: unless-stopped
-    # keep the go service on the shared application network so django containers can call it by service name
     networks:
       - studyroom_lb_net
-    # keep the grpc port internal to the docker network because nginx does not proxy grpc in this stack
     expose:
       - "5102"
 
-  # run the one-time django initialization work before the replicated app containers start
+  # one-time django init
   backend-init:
-    # reuse the shared backend image and runtime configuration
     <<: *backend-common
-    # keep the init container name explicit for docker inspection and logs
     container_name: studyroom_backend_init
-    # keep the init job non-restarting because it should exit after success
     restart: "no"
-    # wait until the internal grpc computation services are started before running django initialization
     depends_on:
       - java-recommendation-service
       - go-availability-service
-    # run migrations, collect static files, and django checks once
     command: ["/bin/sh", "/opt/studyroom/scripts/run-init.sh"]
 
-  # start the first django asgi backend replica that nginx can load balance to
+  # django backend 1
   backend-app-1:
-    # reuse the shared backend image and runtime configuration
     <<: *backend-common
-    # keep the first backend replica container name explicit
     container_name: studyroom_backend_app_1
-    # keep application containers alive across docker daemon restarts
     restart: unless-stopped
-    # wait until the one-time init container finishes successfully
     depends_on:
       backend-init:
         condition: service_completed_successfully
-    # start the replicated daphne application server
     command: ["/bin/sh", "/opt/studyroom/scripts/start-backend.sh"]
-    # keep the internal app port visible to the nginx container through docker networking
     expose:
       - "${BACKEND_APP_PORT}"
-    # keep the backend health check on an internal http path served by daphne
+    # backend health check
     healthcheck:
       test: ["CMD", "python", "/opt/studyroom/scripts/http_healthcheck.py", "127.0.0.1", "${BACKEND_APP_PORT}", "/admin/login/"]
       interval: 15s
       timeout: 5s
       retries: 10
 
-  # start the second django asgi backend replica that nginx can load balance to
+  # django backend 2
   backend-app-2:
-    # reuse the shared backend image and runtime configuration
     <<: *backend-common
-    # keep the second backend replica container name explicit
     container_name: studyroom_backend_app_2
-    # keep application containers alive across docker daemon restarts
     restart: unless-stopped
-    # wait until the one-time init container finishes successfully
     depends_on:
       backend-init:
         condition: service_completed_successfully
-    # start the replicated daphne application server
     command: ["/bin/sh", "/opt/studyroom/scripts/start-backend.sh"]
-    # keep the internal app port visible to the nginx container through docker networking
     expose:
       - "${BACKEND_APP_PORT}"
-    # keep the backend health check on an internal http path served by daphne
+    # backend health check
     healthcheck:
       test: ["CMD", "python", "/opt/studyroom/scripts/http_healthcheck.py", "127.0.0.1", "${BACKEND_APP_PORT}", "/admin/login/"]
       interval: 15s
       timeout: 5s
       retries: 10
 
-  # start the third django asgi backend replica that nginx can load balance to
+  # django backend 3
   backend-app-3:
-    # reuse the shared backend image and runtime configuration
     <<: *backend-common
-    # keep the third backend replica container name explicit
     container_name: studyroom_backend_app_3
-    # keep application containers alive across docker daemon restarts
     restart: unless-stopped
-    # wait until the one-time init container finishes successfully
     depends_on:
       backend-init:
         condition: service_completed_successfully
-    # start the replicated daphne application server
     command: ["/bin/sh", "/opt/studyroom/scripts/start-backend.sh"]
-    # keep the internal app port visible to the nginx container through docker networking
     expose:
       - "${BACKEND_APP_PORT}"
-    # keep the backend health check on an internal http path served by daphne
+    # backend health check
     healthcheck:
       test: ["CMD", "python", "/opt/studyroom/scripts/http_healthcheck.py", "127.0.0.1", "${BACKEND_APP_PORT}", "/admin/login/"]
       interval: 15s
       timeout: 5s
       retries: 10
 
-  # start the nginx reverse proxy and load balancer in front of the replicated backends
+  # nginx load balancer
   nginx-load-balancer:
-    # build the nginx image that serves the frontend and proxies api traffic
     build:
-      # keep the build context at the repository root so docker can see the frontend source tree
       context: ../../..
-      # keep the nginx dockerfile inside the nginx load balancer deployment folder
       dockerfile: docker_file/nginx/load_balancer/nginx.Dockerfile
-    # keep the nginx load balancer container name explicit
     container_name: studyroom_nginx_load_balancer
-    # keep the load balancer restarted automatically when docker restarts
     restart: unless-stopped
-    # keep the same deployment environment variables available for nginx template rendering
     env_file:
       - .env
-    # wait until all backend replicas report healthy before routing external traffic
+    # wait for all backends
     depends_on:
       backend-app-1:
         condition: service_healthy
@@ -174,16 +127,14 @@ services:
         condition: service_healthy
       backend-app-3:
         condition: service_healthy
-    # expose the nginx public port on the host machine for browser access
     ports:
       - "${NGINX_PUBLIC_PORT}:80"
-    # keep the collected django static files mounted read-only into nginx
+    # django static files
     volumes:
       - backend_static_data:/var/www/backend-static:ro
-    # keep nginx only on the application load balancer network
     networks:
       - studyroom_lb_net
-    # keep a simple nginx self-check endpoint available for container health reporting
+    # nginx health check
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/nginx-healthz >/dev/null 2>&1 || exit 1"]
       interval: 15s
@@ -191,23 +142,18 @@ services:
       retries: 10
 
 volumes:
-  # keep collected django static files persistent across backend container recreation
+  # django static files
   backend_static_data:
 
 networks:
-  # keep a dedicated internal network for nginx and the replicated backend containers
+  # internal app network
   studyroom_lb_net:
-    # keep the application network name stable across compose runs
     name: studyroom_lb_net
-  # reuse the existing postgres cluster network so backend containers can reach the primary and replicas by service name
+  # postgres cluster network
   postgres_cluster_net:
-    # mark the postgres cluster network as external because it is created by the postgres compose stack
     external: true
-    # keep the network name aligned with the currently running postgres cluster compose project
     name: cluster_default
-  # reuse the existing redis cluster network so backend containers can reach redis by service name
+  # redis cluster network
   redis_cluster_net:
-    # mark the redis cluster network as external because it is created by the redis compose stack
     external: true
-    # keep the network name aligned with the currently running redis cluster compose project
     name: cluster_redis_cluster_net

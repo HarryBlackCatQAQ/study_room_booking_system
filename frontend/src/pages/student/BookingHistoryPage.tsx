@@ -68,10 +68,6 @@ export default function BookingHistoryPage() {
             Booking History
           </Typography.Title>
 
-          <Typography.Paragraph className="records-hero__desc">
-            Review completed, cancelled, and rejected bookings, and leave feedback after approved sessions have ended.
-          </Typography.Paragraph>
-
           <div className="records-pills">
             <span className="records-pill">{history.length} history records</span>
             <span className="records-pill">{reviewedCount} reviewed</span>
@@ -100,10 +96,6 @@ export default function BookingHistoryPage() {
         <div className="records-toolbar__content">
           <Typography.Text className="records-toolbar__title">
             Completed booking records
-          </Typography.Text>
-
-          <Typography.Text className="records-toolbar__meta">
-            {history.length} record{history.length === 1 ? '' : 's'} found
           </Typography.Text>
         </div>
       </div>

@@ -19,16 +19,9 @@ public class BookingLifecycleGrpcService extends BookingLifecycleServiceGrpc.Boo
     private static final Logger logger = LoggerFactory.getLogger(BookingLifecycleGrpcService.class);
 
     @Override
-    public void findExpiredPendingBookings(
-            ExpiredPendingBookingsRequest request,
-            StreamObserver<ExpiredPendingBookingsResponse> responseObserver
-    ) {
-        logger.info(
-                "Received expired pending booking check request: current_date={}, current_time={}, bookings_count={}",
-                request.getCurrentDate(),
-                request.getCurrentTime(),
-                request.getBookingsCount()
-        );
+    public void findExpiredPendingBookings(ExpiredPendingBookingsRequest request,StreamObserver<ExpiredPendingBookingsResponse> responseObserver) {
+        logger.info("Received expired pending booking check request: current_date={}, current_time={}, bookings_count={}",
+                request.getCurrentDate(),request.getCurrentTime(),request.getBookingsCount());
 
         // store the ids of the pending bookings that should be rejected automatically
         List<Long> expiredBookingIds = new ArrayList<>();
@@ -53,10 +46,7 @@ public class BookingLifecycleGrpcService extends BookingLifecycleServiceGrpc.Boo
                 .addAllExpiredBookingIds(expiredBookingIds)
                 .build();
 
-        logger.info(
-                "Completed expired pending booking check request: expired_bookings_count={}",
-                expiredBookingIds.size()
-        );
+        logger.info("Completed expired pending booking check request: expired_bookings_count={}", expiredBookingIds.size());
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -68,11 +58,7 @@ public class BookingLifecycleGrpcService extends BookingLifecycleServiceGrpc.Boo
     }
 
     // helper function to decide whether the pending booking should be rejected automatically
-    private boolean shouldExpireBooking(
-            PendingBookingSnapshot booking,
-            LocalDate currentDate,
-            LocalTime currentTime
-    ) {
+    private boolean shouldExpireBooking(PendingBookingSnapshot booking, LocalDate currentDate, LocalTime currentTime) {
         LocalDate bookingDate = LocalDate.parse(booking.getBookingDate());
 
         // reject the booking if its booking date has already passed

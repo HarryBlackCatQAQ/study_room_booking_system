@@ -22,7 +22,7 @@ RUN pnpm build
 # keep the runtime image on the official lightweight nginx distribution
 FROM nginx:1.27-alpine
 
-# copy the main nginx configuration with websocket and proxy settings
+# copy the main nginx configuration and proxy settings
 COPY docker_file/nginx/load_balancer/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # copy the templated site configuration so nginx can inject compose environment values on startup

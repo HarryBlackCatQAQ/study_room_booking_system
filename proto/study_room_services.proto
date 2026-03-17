@@ -2,11 +2,17 @@ syntax = "proto3";
 
 package studyroom.v1;
 
+
 option java_multiple_files = true;
+
+// set the package for Java
 option java_package = "com.studynest.grpc";
 option java_outer_classname = "StudyRoomServicesProto";
+
+// set the package for Go
 option go_package = "study-room-grpc/proto;studyroompb";
 
+// room data shared by the grpc services.
 message RoomSnapshot {
   int64 room_id = 1;
   string room_name = 2;
@@ -17,6 +23,7 @@ message RoomSnapshot {
   bool is_active = 7;
 }
 
+// booking data used by the demo availability check.
 message BookingSnapshot {
   int64 room_id = 1;
   string booking_date = 2; // YYYY-MM-DD
@@ -25,48 +32,63 @@ message BookingSnapshot {
   string status = 5;
 }
 
+// review summary kept for compatibility with the existing generated clients.
 message ReviewStat {
   int64 room_id = 1;
   double average_rating = 2;
   int32 review_count = 3;
 }
 
+// request sent to the demo room match service.
 message RecommendationRequest {
+  // these fields are kept for compatibility but are not used by the demo logic.
   string booking_date = 1;
   string start_time = 2;
   string end_time = 3;
   int32 min_capacity = 4;
+  // this field is kept for compatibility but is not used by the demo logic.
   repeated string required_equipment = 5;
+  // filter by this building when the value is greater than 0.
   int64 preferred_building_id = 6;
   repeated RoomSnapshot rooms = 7;
+  // these lists are kept for compatibility but are not used by the demo logic.
   repeated BookingSnapshot bookings = 8;
   repeated ReviewStat review_stats = 9;
 }
 
+// one matched room returned to the client.
 message RecommendedRoom {
   int64 room_id = 1;
   string room_name = 2;
   string building_name = 3;
   double score = 4;
+  // short text that explains why the room was selected.
   string reason = 5;
 }
 
+// response for the demo room match service.
 message RecommendationResponse {
   repeated RecommendedRoom rooms = 1;
 }
 
+// request sent to the demo availability service.
 message AvailabilityRequest {
   string booking_date = 1;
   string search_start_time = 2;
   string search_end_time = 3;
+  // this field is kept for compatibility but is not used by the demo logic.
   int32 duration_minutes = 4;
+  // this field is kept for compatibility but is not used by the demo logic.
   int32 min_capacity = 5;
+  // filter by building when the value is greater than 0.
   int64 building_id = 6;
+  // this field is kept for compatibility but is not used by the demo logic.
   repeated string required_equipment = 7;
   repeated RoomSnapshot rooms = 8;
   repeated BookingSnapshot bookings = 9;
 }
 
+// one room that is free for the requested time range.
 message AvailableSlot {
   int64 room_id = 1;
   string room_name = 2;
@@ -75,10 +97,12 @@ message AvailableSlot {
   string end_time = 5;
 }
 
+// response for the demo availability service.
 message AvailabilityResponse {
   repeated AvailableSlot slots = 1;
 }
 
+// pending booking data used by the lifecycle check.
 message PendingBookingSnapshot {
   int64 booking_id = 1;
   string booking_date = 2; // YYYY-MM-DD
@@ -86,24 +110,29 @@ message PendingBookingSnapshot {
   string status = 4;
 }
 
+// request sent to find pending bookings that already expired.
 message ExpiredPendingBookingsRequest {
   string current_date = 1; // YYYY-MM-DD
   string current_time = 2; // HH:MM
   repeated PendingBookingSnapshot bookings = 3;
 }
 
+// booking ids that should be rejected automatically.
 message ExpiredPendingBookingsResponse {
   repeated int64 expired_booking_ids = 1;
 }
 
+// grpc service for demo room matching.
 service RoomRecommendationService {
   rpc RecommendRooms(RecommendationRequest) returns (RecommendationResponse);
 }
 
+// grpc service for demo availability checks.
 service AvailabilityService {
   rpc FindAvailableSlots(AvailabilityRequest) returns (AvailabilityResponse);
 }
 
+// grpc service for checking expired pending bookings.
 service BookingLifecycleService {
   rpc FindExpiredPendingBookings(ExpiredPendingBookingsRequest) returns (ExpiredPendingBookingsResponse);
 }

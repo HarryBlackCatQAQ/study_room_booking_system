@@ -8,7 +8,5 @@ class ApiPrefix:
     BOOKINGS = "api/bookings/"
     # review endpoints prefix
     REVIEWS = "api/reviews/"
-    # support endpoints prefix
-    SUPPORT = "api/support/"
     # smart service endpoints prefix
     SMART = "api/smart/"

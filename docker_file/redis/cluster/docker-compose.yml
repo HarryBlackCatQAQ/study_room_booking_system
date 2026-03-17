@@ -1,31 +1,5 @@
 services:
-  # run one normal redis instance for channels/pub-sub traffic
-  redis-channel:
-    image: redis:7.4-alpine
-    container_name: studyroom_redis_channel
-    restart: unless-stopped
-    env_file:
-      - .env
-    command:
-      - redis-server
-      - /usr/local/etc/redis/redis-channel.conf
-      - --requirepass
-      - ${REDIS_PASSWORD}
-    ports:
-      - "${REDIS_CHANNEL_PORT}:6379"
-    volumes:
-      - ./conf/redis-channel.conf:/usr/local/etc/redis/redis-channel.conf:ro
-      - redis_channel_data:/data
-    networks:
-      redis_cluster_net:
-        ipv4_address: 172.28.0.10
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
-  # run cluster node 1 for the sharded cache setup
+  # redis cluster node 1
   redis-cluster-node-1:
     image: redis:7.4-alpine
     container_name: studyroom_redis_cluster_node_1
@@ -61,7 +35,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # run cluster node 2 for the sharded cache setup
+  # redis cluster node 2
   redis-cluster-node-2:
     image: redis:7.4-alpine
     container_name: studyroom_redis_cluster_node_2
@@ -97,7 +71,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # run cluster node 3 for the sharded cache setup
+  # redis cluster node 3
   redis-cluster-node-3:
     image: redis:7.4-alpine
     container_name: studyroom_redis_cluster_node_3
@@ -133,7 +107,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # run cluster node 4 for the sharded cache setup
+  # redis cluster node 4
   redis-cluster-node-4:
     image: redis:7.4-alpine
     container_name: studyroom_redis_cluster_node_4
@@ -169,7 +143,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # run cluster node 5 for the sharded cache setup
+  # redis cluster node 5
   redis-cluster-node-5:
     image: redis:7.4-alpine
     container_name: studyroom_redis_cluster_node_5
@@ -205,7 +179,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # run cluster node 6 for the sharded cache setup
+  # redis cluster node 6
   redis-cluster-node-6:
     image: redis:7.4-alpine
     container_name: studyroom_redis_cluster_node_6
@@ -241,7 +215,7 @@ services:
       timeout: 5s
       retries: 10
 
-  # create the redis cluster after all six nodes are online
+  # create the redis cluster
   redis-cluster-init:
     image: redis:7.4-alpine
     container_name: studyroom_redis_cluster_init
@@ -265,23 +239,16 @@ services:
         ipv4_address: 172.28.0.30
 
 volumes:
-  # keep data for the channel redis instance
-  redis_channel_data:
-  # keep data for cluster node 1
+  # redis data
   redis_cluster_node_1_data:
-  # keep data for cluster node 2
   redis_cluster_node_2_data:
-  # keep data for cluster node 3
   redis_cluster_node_3_data:
-  # keep data for cluster node 4
   redis_cluster_node_4_data:
-  # keep data for cluster node 5
   redis_cluster_node_5_data:
-  # keep data for cluster node 6
   redis_cluster_node_6_data:
 
 networks:
-  # use a fixed subnet so every redis node keeps a stable cluster address
+  # fixed subnet for stable node addresses
   redis_cluster_net:
     ipam:
       config:

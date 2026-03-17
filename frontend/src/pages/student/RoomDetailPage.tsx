@@ -74,12 +74,9 @@ export default function RoomDetailPage() {
     : 0;
 
   const equipmentCount = room.equipment?.length || 0;
-
   const bookingStatusMessage = getbookingStatusMesage(room);
 
-
-
-    return (
+  return (
     <>
       <div className="room-detail-page">
 
@@ -325,10 +322,7 @@ export default function RoomDetailPage() {
       />
     </>
   );
-
 }
-
-
 
 function getbookingStatusMesage(room: Room) {
   const bookingStatusMessage = room.is_active

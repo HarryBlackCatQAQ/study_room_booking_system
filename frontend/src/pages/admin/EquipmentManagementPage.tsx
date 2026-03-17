@@ -138,10 +138,6 @@ export default function EquipmentManagementPage() {
             Equipment Management
           </Typography.Title>
 
-          <Typography.Paragraph className="records-hero__desc">
-            Maintain equipment names and status so room filters and room details stay useful for students.
-          </Typography.Paragraph>
-
           <div className="records-pills">
             <span className="records-pill">{equipments.length} equipment items</span>
             <span className="records-pill">{availableEquipmentsCount} available</span>
@@ -170,10 +166,6 @@ export default function EquipmentManagementPage() {
         <div className="records-toolbar__content">
           <Typography.Text className="records-toolbar__title">
             Manage equipment records
-          </Typography.Text>
-
-          <Typography.Text className="records-toolbar__meta">
-            {equipments.length} item{equipments.length === 1 ? '' : 's'} in the current list
           </Typography.Text>
         </div>
 

@@ -28,7 +28,15 @@ class MyBookingListView(generics.ListAPIView):
     def get_queryset(self):
         # sync the expired pending bookings before returning the list to the student
         sync_expired_pending_bookings()
-        return Booking.objects.filter(student=self.request.user).order_by('-booking_date', '-start_time')
+
+        # return the bookings for the student
+        # ordered by booking date and start time
+        return Booking.objects.select_related(
+            'student',
+            'room',
+            'processed_by',
+            'review',
+        ).filter(student=self.request.user).order_by('-booking_date', '-start_time')
 
 
 # define a view for cancelling a booking
@@ -62,7 +70,12 @@ class AdminBookingListView(generics.ListAPIView):
     def get_queryset(self):
         # sync the expired pending bookings before returning the admin booking list
         sync_expired_pending_bookings()
-        return Booking.objects.all().order_by('-created_at')
+        return Booking.objects.select_related(
+            'student',
+            'room',
+            'processed_by',
+            'review',
+        ).order_by('-created_at')
 
 # define a view for approving a booking (admin)
 class ApproveBookingView(APIView):

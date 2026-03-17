@@ -43,7 +43,8 @@ export default function ProfilePage() {
           Click the button above to open the password change form.
         </Typography.Paragraph>
       </Card>
-
+      
+      {/* Render the change password modal */}
       <ChangePasswordModal
         open={passwordOpen}
         onClose={() => setPasswordOpen(false)}

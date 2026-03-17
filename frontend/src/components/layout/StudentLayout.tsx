@@ -1,7 +1,6 @@
 import { BookOutlined, CalendarOutlined, DashboardOutlined, SearchOutlined } from '@ant-design/icons';
 import BaseLayout from './BaseLayout';
 import type { NavigationItem } from '../../types/navigation';
-import StudentSupportChat from '../support/StudentSupportChat';
 
 // Define the navigation items
 const items: NavigationItem[] = [
@@ -13,12 +12,5 @@ const items: NavigationItem[] = [
 
 // Export the StudentLayout component using the BaseLayout
 export default function StudentLayout() {
-  return (
-    <>
-      <BaseLayout items={items} defaultPath="/student" />
-
-      {/* Render the student support chat component (chating with the admin)*/}
-      <StudentSupportChat />
-    </>
-  );
+  return <BaseLayout items={items} defaultPath="/student" />;
 }

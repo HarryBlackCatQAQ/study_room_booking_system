@@ -148,10 +148,6 @@ export default function RoomManagementPage() {
             Room Management
           </Typography.Title>
 
-          <Typography.Paragraph className="records-hero__desc">
-            Create, edit, and review room records, availability, capacity, and assigned equipment.
-          </Typography.Paragraph>
-
           <div className="records-pills">
             <span className="records-pill">{rooms.length} total rooms</span>
             <span className="records-pill">{activeRoomCount} active</span>
@@ -180,10 +176,6 @@ export default function RoomManagementPage() {
         <div className="records-toolbar__content">
           <Typography.Text className="records-toolbar__title">
             Manage room records
-          </Typography.Text>
-
-          <Typography.Text className="records-toolbar__meta">
-            {rooms.length} room{rooms.length === 1 ? '' : 's'} in the current list
           </Typography.Text>
         </div>
 

@@ -84,10 +84,6 @@ export default function MyBookingsPage() {
             My Bookings
           </Typography.Title>
 
-          <Typography.Paragraph className="records-hero__desc">
-            Track active requests and approved reservations that have not ended yet.
-          </Typography.Paragraph>
-
           <div className="records-pills">
             <span className="records-pill">{upcoming.length} active bookings</span>
             <span className="records-pill">{pendingCount} pending</span>
@@ -118,10 +114,6 @@ export default function MyBookingsPage() {
         <div className="records-toolbar__content">
           <Typography.Text className="records-toolbar__title">
             Active reservation list
-          </Typography.Text>
-
-          <Typography.Text className="records-toolbar__meta">
-            {upcoming.length} booking{upcoming.length === 1 ? '' : 's'} found
           </Typography.Text>
         </div>
       </div>

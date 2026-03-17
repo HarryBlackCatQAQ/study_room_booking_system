@@ -10,29 +10,7 @@ from bookings.management.commands.generate_demo_data import Command as DemoDataC
 from bookings.models import Booking
 from reviews.models import Review
 from rooms.models import Room
-from support.models import SupportConversation, SupportMessage
 from users.models import User
-
-
-# student message templates used to expand the main support thread
-STUDENT_SUPPORT_LINES = [
-    "I am checking whether there are any quieter rooms available later this week.",
-    "Could you help confirm if my updated booking history looks correct?",
-    "I want to make sure the approved room still has the listed equipment.",
-    "My group may need a slightly larger room for the next study session.",
-    "I am reviewing older bookings and wanted to double check one of the room details.",
-    "Can you suggest another room near the library with a screen?",
-]
-
-# admin message templates used to expand the main support thread
-ADMIN_SUPPORT_LINES = [
-    "I checked the booking record and everything is still active on our side.",
-    "The room list has several similar spaces available in the same time window.",
-    "I reviewed the equipment details and the room record is up to date.",
-    "Your booking history is stored correctly and should load after a refresh.",
-    "There are a few larger rooms that match the same study requirements.",
-    "The support queue has been updated and your latest request is visible to admins.",
-]
 
 
 class Command(BaseCommand):
@@ -45,11 +23,9 @@ class Command(BaseCommand):
         parser.add_argument("--target-student-bookings", type=int, default=300)
         parser.add_argument("--target-student-reviews", type=int, default=100)
         parser.add_argument("--target-admin-processed-bookings", type=int, default=300)
-        parser.add_argument("--target-student-support-messages", type=int, default=50)
-        parser.add_argument("--target-admin-support-messages", type=int, default=90)
         parser.add_argument("--seed", type=int, default=20260315)
 
-    # top up bookings, reviews, and support data for the main demo accounts
+    # top up bookings and reviews for the main demo accounts
     def handle(self, *args, **options):
         rng = random.Random(options["seed"])
         helper = DemoDataCommand()
@@ -80,26 +56,16 @@ class Command(BaseCommand):
                 rng=rng,
                 helper=helper,
             )
-            created_support_messages = self.ensure_support_thread(
-                student=student,
-                admin=admin,
-                target_student_support_messages=options["target_student_support_messages"],
-                target_admin_support_messages=options["target_admin_support_messages"],
-                rng=rng,
-            )
 
         summary = {
             "student_bookings": Booking.objects.filter(student=student).count(),
             "student_reviews": Review.objects.filter(student=student).count(),
-            "student_support_messages": SupportMessage.objects.filter(sender=student).count(),
             "admin_processed_bookings": Booking.objects.filter(processed_by=admin).count(),
-            "admin_support_messages": SupportMessage.objects.filter(sender=admin).count(),
         }
 
         self.stdout.write(self.style.SUCCESS("Primary account data boost completed."))
         self.stdout.write(f"Created bookings: {created_bookings}")
         self.stdout.write(f"Created reviews: {created_reviews}")
-        self.stdout.write(f"Created support messages: {created_support_messages}")
         self.stdout.write(self.style.SUCCESS(f"Current primary account totals: {summary}"))
 
     # create enough bookings to meet the student, admin, and review targets
@@ -267,131 +233,6 @@ class Command(BaseCommand):
             created += 1
 
         return created
-
-    # expand the shared support thread between the main student and admin accounts
-    def ensure_support_thread(
-        self,
-        student,
-        admin,
-        target_student_support_messages,
-        target_admin_support_messages,
-        rng,
-    ):
-        current_student_messages = SupportMessage.objects.filter(sender=student).count()
-        current_admin_messages = SupportMessage.objects.filter(sender=admin).count()
-
-        student_gap = max(0, target_student_support_messages - current_student_messages)
-        admin_gap = max(0, target_admin_support_messages - current_admin_messages)
-        if student_gap <= 0 and admin_gap <= 0:
-            return 0
-
-        conversation = (
-            SupportConversation.objects.filter(student=student, assigned_admin=admin)
-            .order_by("-last_message_at", "-id")
-            .first()
-        )
-        if conversation is None:
-            conversation = SupportConversation.objects.create(
-                student=student,
-                assigned_admin=admin,
-                status="open",
-            )
-
-        SupportConversation.objects.filter(pk=conversation.pk).update(
-            assigned_admin=admin,
-            status="open",
-        )
-        SupportMessage.objects.filter(
-            conversation=conversation,
-            sender__role="student",
-            is_read_by_admin=False,
-        ).update(is_read_by_admin=True)
-        SupportMessage.objects.filter(
-            conversation=conversation,
-            sender__role="admin",
-            is_read_by_student=False,
-        ).update(is_read_by_student=True)
-
-        message_roles = self.build_message_role_plan(student_gap, admin_gap)
-        if not message_roles:
-            return 0
-
-        now = timezone.now()
-        start_at = now - timedelta(minutes=(len(message_roles) + 6) * 6)
-        if conversation.last_message_at:
-            start_at = max(start_at, conversation.last_message_at + timedelta(minutes=2))
-
-        current_time = start_at
-        created = 0
-
-        for index, role in enumerate(message_roles):
-            sender = student if role == "student" else admin
-            line_pool = STUDENT_SUPPORT_LINES if role == "student" else ADMIN_SUPPORT_LINES
-            content = line_pool[index % len(line_pool)]
-            is_last = index == len(message_roles) - 1
-
-            message = SupportMessage.objects.create(
-                conversation=conversation,
-                sender=sender,
-                content=content,
-                is_read_by_student=True,
-                is_read_by_admin=True,
-            )
-
-            current_time = min(now - timedelta(minutes=1), current_time + timedelta(minutes=6))
-            is_read_by_student = True
-            is_read_by_admin = True
-
-            if is_last:
-                if role == "student":
-                    is_read_by_admin = False
-                else:
-                    is_read_by_student = False
-
-            SupportMessage.objects.filter(pk=message.pk).update(
-                created_at=current_time,
-                is_read_by_student=is_read_by_student,
-                is_read_by_admin=is_read_by_admin,
-            )
-            created += 1
-
-        SupportConversation.objects.filter(pk=conversation.pk).update(
-            assigned_admin=admin,
-            status="open",
-            last_message_at=current_time,
-            updated_at=current_time,
-        )
-
-        return created
-
-    # decide the order of student and admin support messages
-    def build_message_role_plan(self, student_gap, admin_gap):
-        plan = []
-        next_role = "student" if student_gap >= admin_gap else "admin"
-
-        while student_gap > 0 or admin_gap > 0:
-            if next_role == "student" and student_gap > 0:
-                plan.append("student")
-                student_gap -= 1
-                next_role = "admin"
-                continue
-
-            if next_role == "admin" and admin_gap > 0:
-                plan.append("admin")
-                admin_gap -= 1
-                next_role = "student"
-                continue
-
-            if student_gap > 0:
-                plan.append("student")
-                student_gap -= 1
-                continue
-
-            if admin_gap > 0:
-                plan.append("admin")
-                admin_gap -= 1
-
-        return plan
 
     # count approved student bookings that can still receive a review
     def count_unreviewed_past_approved_bookings(self, student):

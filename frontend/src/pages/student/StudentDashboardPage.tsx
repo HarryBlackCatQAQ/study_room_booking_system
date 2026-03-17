@@ -1,11 +1,11 @@
 import { ClockCircleOutlined, CalendarOutlined, SearchOutlined, StarOutlined, ArrowRightOutlined } from '@ant-design/icons';
-import { Button,Card, Col, Row, Statistic, Typography } from 'antd';
+import { Button, Card, Col, Row, Statistic, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { getMyBookings } from '../../api/bookings';
 import { getRooms } from '../../api/rooms';
 import type { Booking, Room } from '../../types';
 import dayjs from 'dayjs';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function StudentDashboardPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -41,7 +41,6 @@ export default function StudentDashboardPage() {
     return false;
   });
 
-
   // approved and ended + cancelled + rejected
   const history = bookings.filter((booking) => {
     if (['cancelled', 'rejected'].includes(booking.status)) {
@@ -65,10 +64,9 @@ export default function StudentDashboardPage() {
     return !isEndedBooking(booking);
   }).length;
 
-
   const studentFocusMessage = getStudentFocusMessage(pendingCount, upcoming, history);
 
-    return (
+  return (
     <>
       <div className="dashboard-page">
 
@@ -80,56 +78,39 @@ export default function StudentDashboardPage() {
           <Typography.Paragraph className="dashboard-hero__copy">
             Quickly check room availability, review your upcoming bookings, and keep track of your past reservations.
           </Typography.Paragraph>
-
         </div>
 
         <Row gutter={[20, 20]}>
           <Col xs={24} sm={12} xl={6}>
             <Card className="stat-card">
               <Statistic title="Available rooms" value={rooms.length} prefix={<SearchOutlined />} />
-              <Typography.Text className="stat-card__hint">
-                Rooms you can browse and reserve.
-              </Typography.Text>
             </Card>
           </Col>
 
           <Col xs={24} sm={12} xl={6}>
             <Card className="stat-card">
               <Statistic title="Pending requests" value={pendingCount} prefix={<ClockCircleOutlined />} />
-              <Typography.Text className="stat-card__hint">
-                Requests waiting for review.
-              </Typography.Text>
             </Card>
           </Col>
 
           <Col xs={24} sm={12} xl={6}>
             <Card className="stat-card">
               <Statistic title="Upcoming sessions" value={approvedUpcomingCount} prefix={<CalendarOutlined />} />
-              <Typography.Text className="stat-card__hint">
-                Approved bookings that have not ended yet.
-              </Typography.Text>
             </Card>
           </Col>
 
           <Col xs={24} sm={12} xl={6}>
             <Card className="stat-card">
               <Statistic title="History records" value={history.length} prefix={<StarOutlined />} />
-              <Typography.Text className="stat-card__hint">
-                Finished, cancelled, or rejected bookings.
-              </Typography.Text>
             </Card>
           </Col>
         </Row>
 
         <div className="dashboard-grid">
-                    <Card className="dashboard-section-card">
-            <Typography.Title level={4} className="dashboard-section-title">
+          <Card className="dashboard-section-card">
+            <Typography.Title level={3} className="dashboard-section-title">
               Booking workflow guide
             </Typography.Title>
-
-            <Typography.Paragraph>
-              The top cards show your numbers. This section explains what each booking state means and what you should do next.
-            </Typography.Paragraph>
 
             <div className="guide-list">
               <div className="guide-item">
@@ -224,7 +205,6 @@ export default function StudentDashboardPage() {
   );
 
 }
-
 
 // get student focus message, judge the situation of student pendingCount, approvedUpcomingCount, history
 function getStudentFocusMessage(pendingCount: number, upcoming: Booking[], history: Booking[]) {

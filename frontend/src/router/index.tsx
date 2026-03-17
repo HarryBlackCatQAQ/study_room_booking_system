@@ -19,7 +19,6 @@ import RoomsPage from '../pages/student/RoomsPage';
 import StudentDashboardPage from '../pages/student/StudentDashboardPage';
 import BuildingManagementPage from '../pages/admin/BuildingManagementPage';
 import EquipmentManagementPage from '../pages/admin/EquipmentManagementPage';
-import SupportMessagesPage from '../pages/admin/SupportMessagesPage';
 
 // Define the application routes using React Router
 export const router = createBrowserRouter([
@@ -90,9 +89,6 @@ export const router = createBrowserRouter([
 
               // the admin booking requests page
               { path: 'requests', element: <BookingRequestsPage /> },
-
-              // the admin support messages page
-              { path: 'support', element: <SupportMessagesPage /> },
 
               // the admin user management page
               { path: 'users', element: <UserManagementPage /> },
