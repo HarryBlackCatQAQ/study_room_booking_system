@@ -95,7 +95,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'daphne',
     'django.contrib.staticfiles',
 
     'corsheaders',
@@ -123,7 +122,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
-ASGI_APPLICATION = 'config.asgi.application'
 
 TEMPLATES = [
     {

@@ -1,0 +1,468 @@
+# keep the django service definition shared across the init and app containers
+x-backend-common: &backend-common
+  build:
+    context: ../..
+    dockerfile: docker_file/public_server/backend.Dockerfile
+  restart: unless-stopped
+  env_file:
+    - .env
+  environment:
+    DJANGO_ENV: container
+    PYTHONDONTWRITEBYTECODE: "1"
+    PYTHONUNBUFFERED: "1"
+    DB_ENGINE: postgres
+    DB_NAME: ${POSTGRESQL_DATABASE}
+    DB_USER: ${POSTGRESQL_USERNAME}
+    DB_PASSWORD: ${POSTGRESQL_PASSWORD}
+    DB_HOST: postgres-primary
+    DB_PORT: "5432"
+    DB_READ_REPLICA_HOSTS: postgres-replica-1,postgres-replica-2
+    DB_READ_REPLICA_PORTS: 5432,5432
+    REDIS_CLUSTER_ENABLED: ${REDIS_CLUSTER_ENABLED}
+    REDIS_CLUSTER_NODES: redis://:${REDIS_PASSWORD}@redis-cluster-node-1:7001,redis://:${REDIS_PASSWORD}@redis-cluster-node-2:7002,redis://:${REDIS_PASSWORD}@redis-cluster-node-3:7003,redis://:${REDIS_PASSWORD}@redis-cluster-node-4:7004,redis://:${REDIS_PASSWORD}@redis-cluster-node-5:7005,redis://:${REDIS_PASSWORD}@redis-cluster-node-6:7006
+    REDIS_CLUSTER_READ_FROM_REPLICAS: ${REDIS_CLUSTER_READ_FROM_REPLICAS}
+    REDIS_CLUSTER_REQUIRE_FULL_COVERAGE: ${REDIS_CLUSTER_REQUIRE_FULL_COVERAGE}
+  volumes:
+    - backend_static_data:/app/staticfiles
+  networks:
+    - studyroom_app_net
+    - studyroom_postgres_net
+    - studyroom_redis_net
+
+services:
+  # keep the public frontend in a dedicated static container
+  frontend-app:
+    build:
+      context: ../..
+      dockerfile: docker_file/public_server/frontend.Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
+    restart: unless-stopped
+    networks:
+      - studyroom_app_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/ >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  # keep the java grpc service internal to the app network
+  java-recommendation-service:
+    build:
+      context: ../..
+      dockerfile: docker_file/public_server/java-recommendation.Dockerfile
+    restart: unless-stopped
+    networks:
+      - studyroom_app_net
+    expose:
+      - "5101"
+
+  # keep the go grpc service internal to the app network
+  go-availability-service:
+    build:
+      context: ../..
+      dockerfile: docker_file/public_server/go-availability.Dockerfile
+    restart: unless-stopped
+    networks:
+      - studyroom_app_net
+    expose:
+      - "5102"
+
+  # keep one postgres primary for every write operation
+  postgres-primary:
+    image: bitnami/postgresql:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRESQL_DATABASE: ${POSTGRESQL_DATABASE}
+      POSTGRESQL_USERNAME: ${POSTGRESQL_USERNAME}
+      POSTGRESQL_PASSWORD: ${POSTGRESQL_PASSWORD}
+      POSTGRESQL_POSTGRES_PASSWORD: ${POSTGRESQL_POSTGRES_PASSWORD}
+      POSTGRESQL_REPLICATION_MODE: master
+      POSTGRESQL_REPLICATION_USER: ${POSTGRESQL_REPLICATION_USER}
+      POSTGRESQL_REPLICATION_PASSWORD: ${POSTGRESQL_REPLICATION_PASSWORD}
+    volumes:
+      - postgres_primary_data:/bitnami/postgresql
+      - ./postgres/init-primary:/docker-entrypoint-initdb.d:ro
+    networks:
+      - studyroom_postgres_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${POSTGRESQL_USERNAME} -d ${POSTGRESQL_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # keep the first read replica available for read-only traffic
+  postgres-replica-1:
+    image: bitnami/postgresql:latest
+    restart: unless-stopped
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      POSTGRESQL_DATABASE: ${POSTGRESQL_DATABASE}
+      POSTGRESQL_USERNAME: ${POSTGRESQL_USERNAME}
+      POSTGRESQL_PASSWORD: ${POSTGRESQL_PASSWORD}
+      POSTGRESQL_POSTGRES_PASSWORD: ${POSTGRESQL_POSTGRES_PASSWORD}
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_MASTER_HOST: postgres-primary
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_REPLICATION_USER: ${POSTGRESQL_REPLICATION_USER}
+      POSTGRESQL_REPLICATION_PASSWORD: ${POSTGRESQL_REPLICATION_PASSWORD}
+    volumes:
+      - postgres_replica_1_data:/bitnami/postgresql
+    networks:
+      - studyroom_postgres_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${POSTGRESQL_USERNAME} -d ${POSTGRESQL_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # keep the second read replica available for read-only traffic
+  postgres-replica-2:
+    image: bitnami/postgresql:latest
+    restart: unless-stopped
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      POSTGRESQL_DATABASE: ${POSTGRESQL_DATABASE}
+      POSTGRESQL_USERNAME: ${POSTGRESQL_USERNAME}
+      POSTGRESQL_PASSWORD: ${POSTGRESQL_PASSWORD}
+      POSTGRESQL_POSTGRES_PASSWORD: ${POSTGRESQL_POSTGRES_PASSWORD}
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_MASTER_HOST: postgres-primary
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_REPLICATION_USER: ${POSTGRESQL_REPLICATION_USER}
+      POSTGRESQL_REPLICATION_PASSWORD: ${POSTGRESQL_REPLICATION_PASSWORD}
+    volumes:
+      - postgres_replica_2_data:/bitnami/postgresql
+    networks:
+      - studyroom_postgres_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${POSTGRESQL_USERNAME} -d ${POSTGRESQL_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # keep the first redis cluster node explicit for cluster bootstrap
+  redis-cluster-node-1:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7001"
+      - --cluster-announce-hostname
+      - redis-cluster-node-1
+      - --cluster-announce-port
+      - "7001"
+      - --cluster-announce-bus-port
+      - "17001"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    volumes:
+      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_1_data:/data
+    networks:
+      - studyroom_redis_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7001", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # keep the second redis cluster node explicit for cluster bootstrap
+  redis-cluster-node-2:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7002"
+      - --cluster-announce-hostname
+      - redis-cluster-node-2
+      - --cluster-announce-port
+      - "7002"
+      - --cluster-announce-bus-port
+      - "17002"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    volumes:
+      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_2_data:/data
+    networks:
+      - studyroom_redis_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7002", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # keep the third redis cluster node explicit for cluster bootstrap
+  redis-cluster-node-3:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7003"
+      - --cluster-announce-hostname
+      - redis-cluster-node-3
+      - --cluster-announce-port
+      - "7003"
+      - --cluster-announce-bus-port
+      - "17003"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    volumes:
+      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_3_data:/data
+    networks:
+      - studyroom_redis_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7003", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # keep the fourth redis cluster node explicit for cluster bootstrap
+  redis-cluster-node-4:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7004"
+      - --cluster-announce-hostname
+      - redis-cluster-node-4
+      - --cluster-announce-port
+      - "7004"
+      - --cluster-announce-bus-port
+      - "17004"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    volumes:
+      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_4_data:/data
+    networks:
+      - studyroom_redis_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7004", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # keep the fifth redis cluster node explicit for cluster bootstrap
+  redis-cluster-node-5:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7005"
+      - --cluster-announce-hostname
+      - redis-cluster-node-5
+      - --cluster-announce-port
+      - "7005"
+      - --cluster-announce-bus-port
+      - "17005"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    volumes:
+      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_5_data:/data
+    networks:
+      - studyroom_redis_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7005", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # keep the sixth redis cluster node explicit for cluster bootstrap
+  redis-cluster-node-6:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis-cluster.conf
+      - --port
+      - "7006"
+      - --cluster-announce-hostname
+      - redis-cluster-node-6
+      - --cluster-announce-port
+      - "7006"
+      - --cluster-announce-bus-port
+      - "17006"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --masterauth
+      - ${REDIS_PASSWORD}
+    volumes:
+      - ./redis/redis-cluster.conf:/usr/local/etc/redis/redis-cluster.conf:ro
+      - redis_cluster_node_6_data:/data
+    networks:
+      - studyroom_redis_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "7006", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # keep the redis cluster creation in a one-time init container
+  redis-cluster-init:
+    image: redis:7.4-alpine
+    restart: "no"
+    env_file:
+      - .env
+    depends_on:
+      redis-cluster-node-1:
+        condition: service_healthy
+      redis-cluster-node-2:
+        condition: service_healthy
+      redis-cluster-node-3:
+        condition: service_healthy
+      redis-cluster-node-4:
+        condition: service_healthy
+      redis-cluster-node-5:
+        condition: service_healthy
+      redis-cluster-node-6:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - /scripts/create-redis-cluster.sh
+    volumes:
+      - ./scripts/create-redis-cluster.sh:/scripts/create-redis-cluster.sh:ro
+    networks:
+      - studyroom_redis_net
+
+  # keep the django init step separate from the long-running app containers
+  backend-init:
+    <<: *backend-common
+    restart: "no"
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      postgres-replica-1:
+        condition: service_healthy
+      postgres-replica-2:
+        condition: service_healthy
+      redis-cluster-init:
+        condition: service_completed_successfully
+      java-recommendation-service:
+        condition: service_started
+      go-availability-service:
+        condition: service_started
+    command: ["/bin/sh", "/opt/studyroom/scripts/run-backend-init.sh"]
+
+  # keep the first django container behind nginx
+  backend-app-1:
+    <<: *backend-common
+    depends_on:
+      backend-init:
+        condition: service_completed_successfully
+    command: ["/bin/sh", "/opt/studyroom/scripts/start-backend.sh"]
+    expose:
+      - "${BACKEND_APP_PORT}"
+    healthcheck:
+      test: ["CMD", "python", "/opt/studyroom/scripts/http_healthcheck.py", "127.0.0.1", "${BACKEND_APP_PORT}", "/manage/login/"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+
+  # keep the second django container behind nginx
+  backend-app-2:
+    <<: *backend-common
+    depends_on:
+      backend-init:
+        condition: service_completed_successfully
+    command: ["/bin/sh", "/opt/studyroom/scripts/start-backend.sh"]
+    expose:
+      - "${BACKEND_APP_PORT}"
+    healthcheck:
+      test: ["CMD", "python", "/opt/studyroom/scripts/http_healthcheck.py", "127.0.0.1", "${BACKEND_APP_PORT}", "/manage/login/"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+
+  # keep nginx as the only public entry point
+  nginx-load-balancer:
+    build:
+      context: ../..
+      dockerfile: docker_file/public_server/nginx.Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      frontend-app:
+        condition: service_healthy
+      backend-app-1:
+        condition: service_healthy
+      backend-app-2:
+        condition: service_healthy
+    ports:
+      - "${NGINX_PUBLIC_PORT}:80"
+    volumes:
+      - backend_static_data:/var/www/backend-static:ro
+    networks:
+      - studyroom_app_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/nginx-healthz >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  # keep django collected static files shared between backend init and nginx
+  backend_static_data:
+  postgres_primary_data:
+  postgres_replica_1_data:
+  postgres_replica_2_data:
+  redis_cluster_node_1_data:
+  redis_cluster_node_2_data:
+  redis_cluster_node_3_data:
+  redis_cluster_node_4_data:
+  redis_cluster_node_5_data:
+  redis_cluster_node_6_data:
+
+networks:
+  # keep the public app tier on its own network
+  studyroom_app_net:
+  # keep the postgres cluster isolated from the public edge
+  studyroom_postgres_net:
+  # keep the redis cluster isolated from the public edge
+  studyroom_redis_net:

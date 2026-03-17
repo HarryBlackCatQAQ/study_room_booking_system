@@ -3,10 +3,10 @@
 这个项目不是普通的前后端两层结构，而是一个完整的多服务系统：
 
 - 前端：`React + Vite`
-- 后端：`Django + Daphne + Channels`
+- 后端：`Django`
 - 推荐服务：`Java gRPC`
 - 可用时段服务：`Go gRPC`
-- 缓存与 WebSocket：`Redis Cluster + 单独的 Redis channel`
+- 缓存：`Redis Cluster`
 - 数据库：`PostgreSQL 主从`
 - 统一入口：`Nginx`
 
@@ -32,7 +32,7 @@
 
 - 这条路线和当前代码最匹配
 - 不需要重写业务逻辑
-- 已经考虑了 `/api/`、`/ws/`、前端静态资源、Django static 的代理问题
+- 已经考虑了 `/api/`、前端静态资源、Django static 的代理问题
 - Java 和 Go 服务也已经被纳入容器编排
 
 ## 2. 服务器配置建议
@@ -179,9 +179,8 @@ SECURE_SSL_REDIRECT=False
 SESSION_COOKIE_SECURE=True
 CSRF_COOKIE_SECURE=True
 DB_PASSWORD=和数据库 .env 保持一致
-REDIS_URL=redis://:你的redis密码@redis-channel:6379/0
-REDIS_CHANNEL_URL=redis://:你的redis密码@redis-channel:6379/0
-REDIS_CHANNEL_HOSTS=redis://:你的redis密码@redis-channel:6379/0
+# 仅在未启用 Redis Cluster 缓存时使用
+REDIS_URL=redis://:你的redis密码@你的redis主机:6379/0
 REDIS_CLUSTER_NODES=redis://:你的redis密码@redis-cluster-node-1:7001,redis://:你的redis密码@redis-cluster-node-2:7002,redis://:你的redis密码@redis-cluster-node-3:7003,redis://:你的redis密码@redis-cluster-node-4:7004,redis://:你的redis密码@redis-cluster-node-5:7005,redis://:你的redis密码@redis-cluster-node-6:7006
 ```
 
@@ -264,7 +263,6 @@ docker compose ps
 
 你应该能看到：
 
-- `redis-channel`
 - `redis-cluster-node-1` 到 `redis-cluster-node-6`
 - `redis-cluster-init`
 
@@ -377,8 +375,6 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
     }
 }
 ```
@@ -465,7 +461,6 @@ docker exec -i studyroom_postgres_primary psql -U studyuser -d studyroom < backu
 - 首页：`https://你的域名`
 - Django admin：`https://你的域名/admin/`
 - API：`https://你的域名/api/rooms/`
-- WebSocket：前端打开支持聊天页面，检查是否能正常建立连接
 
 ### 容器检查命令
 
@@ -492,15 +487,7 @@ docker logs -f studyroom_go_availability_service
 - `CORS_ALLOWED_ORIGINS`
 - `DEBUG=False` 后是否还有旧配置残留
 
-### 2. 页面能打开，但登录聊天失败
-
-优先检查：
-
-- 宿主机 Nginx 是否把 `Upgrade` 和 `Connection` 头透传了
-- Docker 中的 `nginx-load-balancer` 是否正常运行
-- Redis channel 是否正常
-
-### 3. 前端能打开，但推荐功能不可用
+### 2. 前端能打开，但推荐功能不可用
 
 优先检查：
 
@@ -509,7 +496,7 @@ docker logs -f studyroom_go_availability_service
 - `JAVA_RECOMMENDATION_GRPC_TARGET`
 - `GO_AVAILABILITY_GRPC_TARGET`
 
-### 4. 数据库连不上
+### 3. 数据库连不上
 
 优先检查：
 
@@ -517,7 +504,7 @@ docker logs -f studyroom_go_availability_service
 - `DB_PASSWORD` 是否和数据库 `.env` 一致
 - 先看 `backend-init` 容器日志
 
-### 5. Redis Cluster 报错
+### 4. Redis Cluster 报错
 
 优先检查：
 
