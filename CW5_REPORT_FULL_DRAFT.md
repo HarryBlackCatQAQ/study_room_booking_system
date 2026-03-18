@@ -1,4 +1,4 @@
-# Study Room Booking System
+﻿# Study Room Booking System
 ## CW5 Web Application Implementation Report
 
 Team AA  
@@ -102,13 +102,11 @@ This data design supports the full workflow of authentication, room browsing, bo
 
 **[Insert Figure 3: Site Map]**
 
-The site structure is organised around role-based navigation.
+The implemented site structure keeps the original role-based layout. Public users first access the landing page and the login / register pages, and are then redirected to either the student dashboard or the administrator dashboard.
 
-On the student side, users can access the landing page, login and registration pages, student dashboard, room browsing page, room detail page, my bookings page, booking history page, and profile page.
+Compared with the original design, the student side now separates Browse Rooms, My Bookings, Booking History, and Profile, and also includes room detail, availability check, booking, cancellation, and review actions. On the administrator side, Room Management and Booking Requests are retained, while Building Management, Equipment Management, User Management, and Profile / Security pages are added.
 
-On the administrator side, authenticated admin users can access the admin dashboard, booking request management page, room management page, building management page, equipment management page, user management page, and profile page.
-
-This structure keeps the student journey simple while also separating administrative tasks into focused management pages.
+This updated structure remains clear and simple, while reflecting the implemented routes more accurately than the original design version.
 
 ### 2.6 User Interface Design
 
@@ -154,114 +152,97 @@ These additions make the system more complete from an administrative perspective
 
 ### 3.1 System Architecture
 
-The final system uses a separated frontend and backend architecture.
+The implemented system uses a multi-service web architecture. The frontend is a React single-page application built with **React**, **Vite**, **TypeScript**, **React Router**, **Axios**, and **Ant Design**, and it handles client-side routing, forms, and asynchronous UI updates.
 
-The frontend is implemented as a React single-page application using **React**, **Vite**, **TypeScript**, **React Router**, **Axios**, and **Ant Design**. This frontend is responsible for rendering the user interface, handling client-side routing, validating user input, and performing asynchronous API requests.
+The main backend is implemented with **Django** and **Django REST Framework**, which provide API routing, business logic, database access, role-based permissions, and JWT-based authentication. The deployed architecture also includes **Nginx** as the public entry point, a **PostgreSQL** primary database with read replicas, and a **Redis Cluster** used for caching and locking.
 
-The backend is implemented using **Django** and **Django REST Framework**. It provides the application’s main business logic, API endpoints, database interaction, role-based permissions, and authentication features. Authentication is handled using JWT tokens so that protected API endpoints can be accessed securely from the frontend.
-
-Beyond the core Django backend, the project also includes two supporting services. A **Java gRPC service** provides room recommendation functionality, and a **Go gRPC service** provides availability searching for requested time ranges. These services are called by Django and exposed to the frontend through API endpoints.
+In addition, Django integrates with two supporting gRPC services: a **Java** service for room recommendation and a **Go** service for time-slot availability checking. This makes the final implementation broader than a simple two-tier web application while still keeping Django as the core application backend.
 
 ### 3.2 Main Components
 
 The implemented system contains the following main components:
 
 - **Frontend application:** student and administrator interfaces built with React.
-- **Authentication module:** registration, login, profile, and password change endpoints.
-- **Room management module:** room listing, room detail, room creation, update, and deletion.
-- **Booking module:** booking creation, booking listing, cancellation, approval, and rejection.
-- **Review module:** room review listing and review submission after completed approved bookings.
-- **Administrative management module:** building, equipment, and user account management.
-- **Smart services module:** room recommendation and availability search via gRPC-integrated backend endpoints.
+- **Django REST API backend:** core business logic, permissions, authentication, and data access.
+- **Authentication and profile module:** student registration, login, profile retrieval, and password change.
+- **Room resource management module:** rooms, buildings, and equipment data management.
+- **Booking lifecycle module:** booking creation, approval, rejection, cancellation, and expired-pending synchronisation.
+- **Review module:** room review listing and review submission after eligible completed bookings.
+- **Smart services module:** room recommendation and availability search through gRPC-integrated backend endpoints.
+- **Infrastructure layer:** Nginx, PostgreSQL primary/replica deployment, and Redis-based caching support.
 
 Each major feature is separated into reusable pages, API modules, backend apps, serializers, and service layers, which helps keep the implementation organised and maintainable.
 
 ### 3.3 Key Features
 
 **User Authentication (M1)**  
-User authentication is implemented using Django-based backend logic and JWT authentication for API access. Students and administrators can register and log in, and the system redirects authenticated users to the correct dashboard according to their role.
+Students can register through the public registration page, and both students and administrators can log in through JWT-based authentication. After login, the system redirects users to the correct dashboard according to role. Administrator accounts are managed through the administrative user-management workflow rather than public self-registration.
 
 **Room Browsing (M2)**  
-Students can browse rooms on the room listing page and view room details such as building, location, capacity, and equipment. The interface also supports filtering and searching to help users find a suitable room more quickly.
+Students can browse rooms through search, filters, pagination, and a smart suggestion panel, then open room detail pages showing building information, capacity, equipment, ratings, and reviews.
 
 **Room Booking (M3)**  
-Students can submit a booking request by choosing a room, date, start time, and end time. The backend validates the request and prevents overlapping bookings.
+From the room detail page, students can check availability for a selected time range and submit a booking request. The backend validates booking rules and prevents overlapping reservations.
 
 **Booking Tracking and History (M4)**  
-Students can view their current booking requests and booking history. The history page also allows completed approved bookings to be reviewed.
+`My Bookings` shows pending and upcoming requests and supports cancellation. `Booking History` stores completed, rejected, and cancelled records and allows eligible completed bookings to receive reviews.
 
 **Room Management (M5)**  
-Administrators can create, update, and delete room records through dedicated management pages.
+Administrators can create, edit, and delete room records. The implemented system also extends this management flow to related building and equipment data through dedicated pages.
 
 **Booking Approval (M6)**  
-Administrators can review booking requests and approve or reject them. Approved and rejected requests are recorded with status updates.
+Administrators can review booking requests and approve or reject them through the booking requests page. In addition, expired pending bookings are synchronised and automatically rejected by backend lifecycle logic.
 
-In addition to the core must-have requirements, the final system also includes booking cancellation, room reviews, building management, equipment management, user management, room recommendation, and availability checking.
+In addition to the core must-have requirements, the final system also includes profile management, password change, room reviews, building management, equipment management, user management, room recommendation, and availability checking.
 
 ### 3.4 Front-end Interactivity
 
 The application clearly demonstrates client-side interactivity beyond static page rendering.
 
-The React frontend provides dynamic room filtering and pagination, form validation, asynchronous API requests, role-based route protection, and live interface updates after user actions such as login, booking creation, or request approval. The booking forms, login forms, and management forms all validate required input before submission.
+The React frontend supports dynamic room filtering and pagination, role-based route protection, validation on authentication, booking, and management forms, modal-based booking and review flows, and live feedback after asynchronous actions such as login, booking submission, approval, or review creation.
 
-The system also includes two interactive smart features. The room recommendation interface submits form data asynchronously and displays suggested rooms based on the selected criteria. The availability checking interface allows users to query a time range and immediately view available rooms without requiring a full page reload.
-
-These behaviours provide clear evidence that the application meets the coursework requirement for frontend interactivity.
+The recommendation panel and availability checker both send asynchronous requests and update the interface without requiring a full page reload. These behaviours provide clear evidence that the application meets the coursework requirement for frontend interactivity.
 
 ### 3.5 Look and Feel
 
 The interface was designed to be polished, consistent, and responsive.
 
-The project uses Ant Design components together with custom CSS for layouts, forms, cards, tables, navigation, status displays, and page sections. Shared layout components are used for both student and administrator views, helping the system maintain a consistent visual language.
+The project uses Ant Design components together with custom CSS for dashboards, cards, tables, navigation, status displays, and forms. Shared student and administrator layout components help maintain a consistent visual language across the system.
 
-The colour palette, spacing, typography, and dashboard layout were designed to make the interface more refined than the original wireframes. Responsive CSS is also used so that major pages, particularly authentication and dashboard layouts, adapt to smaller screens. As a result, the final application provides a more professional and coherent user experience.
+Responsive CSS rules and flexible layouts allow key pages such as the authentication screens, dashboards, room pages, and record tables to adapt to smaller screens. As a result, the final application provides a more professional and coherent user experience than the original wireframes.
 
 ### 3.6 Code Quality and Organisation
 
 The codebase is organised to support separation of concerns and reusability.
 
-On the frontend, routing, API access, reusable components, page components, styles, and utility functions are separated into different modules. On the backend, functionality is divided into dedicated Django apps including users, rooms, bookings, reviews, and smart services.
+On the frontend, routes, page components, API clients, layouts, reusable components, styles, and types are separated into dedicated modules. API configuration uses a configurable base URL and a token-refresh interceptor rather than hard-coded requests inside UI components.
 
-Reusable serializers, API client modules, and shared layout components reduce duplication and make the code easier to maintain. API configuration is also kept separate from page code so that frontend requests are not hard-coded directly inside UI components. This structure helps the implementation satisfy the coursework expectations for readable and well-organised code.
+On the backend, functionality is divided into dedicated Django apps including `users`, `rooms`, `bookings`, `reviews`, and `smart_services`, with serializers, services, permissions, database routing, and cache configuration kept in separate modules. Route-level lazy loading was also introduced so that large page modules are loaded only when needed. This structure supports maintainability, reuse, and easier testing.
 
 ---
 
 ## 4. Testing
 
-Testing was carried out using a combination of automated API tests and manual browser-based testing.
+Testing combined automated API tests with manual browser-based verification.
 
-The automated tests were implemented using Django REST Framework’s testing tools. These tests focus on important business rules and API behaviour across the authentication, booking, room, and review modules.
+The automated suite was written using Django REST Framework testing tools and covers authentication, profile retrieval, password change, room list and detail retrieval, admin room permissions, booking creation, booking conflict prevention, cancellation, booking approval and rejection, automatic rejection of expired pending bookings, review submission rules, and administrative user management.
 
-The automated test suite covers the following areas:
-
-- user registration and login
-- invalid login handling
-- profile retrieval and password change
-- room list and room detail retrieval
-- admin room creation permissions
-- booking creation
-- booking conflict prevention
-- booking cancellation
-- admin booking approval and rejection
-- auto-rejection of expired pending bookings
-- review creation rules
-- restrictions on reviewing incomplete or already reviewed bookings
-- administrative user management behaviour
-
-The automated tests were run on **17 March 2026** using the following command:
+The automated test run used in this report was executed on **17 March 2026** with the following command:
 
 ```bash
 ./.venv/bin/python backend/manage.py test bookings reviews users rooms smart_services
 ```
 
-The result was:
+The recorded result was:
 
 ```text
 Ran 42 tests in 90.226s
 OK
 ```
 
-In addition to the automated tests, manual testing was used to verify the complete user journey in the browser. This included logging in, browsing rooms, submitting a booking request, approving or rejecting a booking as an administrator, viewing booking history, and submitting a room review after a completed booking.
+The `smart_services` app was included in the command so the full backend suite ran together, but the recommendation and availability flows were mainly verified through manual end-to-end testing.
+
+Manual testing checked the main user journeys in the browser, including student registration and login, room browsing, room detail and availability checking, booking submission, booking cancellation, administrator approval or rejection, booking history viewing, and review submission after an eligible completed booking.
 
 Together, these automated and manual checks provide evidence that the implemented system behaves correctly for the main coursework requirements.
 
@@ -271,85 +252,74 @@ Together, these automated and manual checks provide evidence that the implemente
 
 ## 5. Accessibility Report
 
-The accessibility plan created during the design phase was applied to the final system through several practical interface improvements. The improvements were mainly implemented on the login page, booking-related forms, and other important user input flows.
+The accessibility plan from the design phase was applied to the final system through several concrete improvements on key pages such as login, registration, booking, profile, and management forms.
 
 ### 5.1 Keyboard Accessibility
 
-The system supports keyboard-based interaction for important user tasks. Users can move through form fields, buttons, and links using the keyboard, and actions such as login and booking submission can be completed without relying on a mouse.
-
-This improves usability for keyboard-only users and supports more accessible interaction across the interface.
+Important workflows can be completed by keyboard. Users can move through links, buttons, inputs, selects, and date pickers without relying on a mouse, and tasks such as login, registration, booking submission, and management-form interaction remain usable through standard keyboard navigation.
 
 **[Insert Figure 9: Screenshot showing keyboard navigation or focused element]**
 
 ### 5.2 Visible Focus Indicators
 
-Visible focus styling was added so that users can clearly see which interactive element is currently selected when navigating by keyboard. Buttons, input fields, select components, and date/time pickers all display a clear focus outline.
-
-This change directly supports the accessibility plan by making keyboard navigation easier to follow.
+Visible focus styling was added to improve keyboard usability. Buttons, input fields, select controls, and picker components show a clear focus outline, making it easier for users to see which element is currently active.
 
 **[Insert Figure 10: Screenshot showing visible focus outline]**
 
 ### 5.3 Clear Labels and Input Guidance
 
-Forms across the system use clear labels and supporting guidance. For example, the login page includes labelled fields for **Username** and **Password**, and the booking form includes labelled fields for **Date**, **Start Time**, and **End Time**. Some fields also include placeholders or validation messages to help users understand what information is expected.
-
-This reduces user error and improves accessibility for users who need clearer form semantics.
+Forms across the system use clear labels and supporting guidance. Login, registration, booking, password-change, and management forms all use labelled fields, and several inputs also provide placeholders or validation messages to help users understand what information is required.
 
 **[Insert Figure 11: Screenshot showing labelled login or booking form]**
 
 ### 5.4 Summary
 
-These improvements show that the accessibility plan was applied in the implemented system rather than remaining only at the design stage. The changes focus on practical usability improvements that are visible in the final user interface and supported by evidence from key pages.
+These improvements show that the accessibility plan was implemented in the final system rather than remaining only at the design stage. The changes focus on visible, practical usability improvements that can be demonstrated through screenshots from the implemented interface.
 
 ---
 
 ## 6. Sustainability Report
 
-The sustainability-related performance of the application was evaluated using **Google Lighthouse**. The evaluation focused on user-facing pages because the coursework brief requires performance evidence for at least two pages, including the homepage and one core feature page.
+The sustainability-related performance evaluation was carried out using **Google Lighthouse 13.0.3**. To keep the measurement environment consistent, the tests were run on **18 March 2026** against a local production preview built from the submitted frontend code.
 
 ### 6.1 Tool and Pages Tested
 
-The following pages were tested on **17 March 2026**:
+The following two pages were tested:
 
-- Homepage: `http://ttz3305012.uk/`
-- Login page: `http://ttz3305012.uk/login`
+- Homepage: `http://127.0.0.1:4173/`
+- Login page: `http://127.0.0.1:4173/login`
 
-These pages were selected because they are public entry points to the application and represent important user-facing parts of the system.
+These pages were selected because they represent the public entry points of the application and satisfy the coursework requirement to measure at least two user-facing pages.
 
 ### 6.2 Baseline Measurement
 
-The baseline Lighthouse results were:
+The baseline Lighthouse results before the optimisation were:
 
 | Page | Performance | Accessibility | Best Practices | SEO |
 | --- | ---: | ---: | ---: | ---: |
-| Homepage | 46 | 98 | 78 | 83 |
-| Login page | 40 | 94 | 78 | 82 |
+| Homepage | 70 | 98 | 100 | 83 |
+| Login page | 78 | 94 | 100 | 82 |
 
-The baseline results showed that accessibility was already relatively strong, but performance was weaker. The main issue identified by Lighthouse was the size of the frontend JavaScript bundle. For example, Lighthouse estimated unused JavaScript savings of approximately **1,098 KiB** on the homepage and **1,039 KiB** on the login page.
+The baseline results showed that the main issue was frontend payload size. On the homepage, Lighthouse reported **First Contentful Paint 4.1 s**, **Largest Contentful Paint 5.1 s**, **Total Blocking Time 130 ms**, and about **338 KiB** of unused JavaScript. On the login page, it reported **First Contentful Paint 3.5 s**, **Largest Contentful Paint 4.1 s**, **Total Blocking Time 130 ms**, about **319 KiB** of unused JavaScript, and about **15 KiB** of unused CSS.
 
 ### 6.3 Changes Implemented
 
-To improve sustainability-related performance, the frontend should be optimised to reduce the amount of JavaScript loaded during the initial page load. Suitable implemented changes include:
+One real optimisation was implemented and measured for this report: route-level code splitting in the React router using `React.lazy` and `Suspense`, so large page modules are loaded only when they are needed.
 
-- introducing route-level code splitting for page components
-- reducing unnecessary JavaScript in the initial bundle
-- reducing unused CSS where possible
-- keeping frequently requested room and building endpoints cached
-
-**Important:** this subsection must describe only the changes that were actually implemented in the final submitted version. If additional optimisation work is completed before submission, this paragraph should be updated to reflect the exact changes made.
+This reduced the amount of JavaScript processed during the initial page load. In the production build before the optimisation, Vite generated one main JavaScript bundle of **1,474.14 kB** before gzip (**452.99 kB** gzip). After the optimisation, the largest shared JavaScript chunk dropped to **669.62 kB** before gzip (**222.07 kB** gzip), with additional route-specific chunks loaded separately. The project also already uses Redis-backed caching for frequently requested room and review endpoints, but the measured improvement discussed here came from the new frontend loading strategy.
 
 ### 6.4 After Measurement and Reflection
 
-After implementing the performance improvements, Lighthouse should be run again on the same two pages and the updated results should be reported below.
+After implementing route-level code splitting, Lighthouse was run again on the same two pages:
 
 | Page | Performance Before | Performance After | Accessibility Before | Accessibility After | Best Practices Before | Best Practices After |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Homepage | 46 | **[Fill in]** | 98 | **[Fill in]** | 78 | **[Fill in]** |
-| Login page | 40 | **[Fill in]** | 94 | **[Fill in]** | 78 | **[Fill in]** |
+| Homepage | 70 | 84 | 98 | 98 | 100 | 100 |
+| Login page | 78 | 83 | 94 | 94 | 100 | 100 |
 
-Suggested reflection text after you fill in the real values:
+The after-measurement also showed improved loading metrics. Homepage **First Contentful Paint** improved from **4.1 s** to **2.8 s**, **Largest Contentful Paint** from **5.1 s** to **3.8 s**, **Total Blocking Time** from **130 ms** to **30 ms**, and unused JavaScript fell from about **338 KiB** to about **116 KiB**. On the login page, **First Contentful Paint** improved from **3.5 s** to **2.8 s**, **Largest Contentful Paint** from **4.1 s** to **3.9 s**, **Total Blocking Time** from **130 ms** to **60 ms**, and unused JavaScript fell from about **319 KiB** to about **106 KiB**.
 
-The main improvement came from reducing the amount of frontend code that needed to be processed during the initial page load. After optimisation, the tested pages loaded more efficiently, which improved the performance score and reduced unnecessary resource usage. Accessibility remained strong because the optimisation work focused mainly on bundle size and page delivery rather than changing form semantics or navigation behaviour.
+The main improvement came from reducing the amount of frontend code that had to be downloaded and processed during the initial page load. Accessibility and best-practice scores remained stable because the optimisation targeted delivery and loading behaviour rather than changing form semantics or navigation patterns.
 
 **[Insert Figure 12: Lighthouse baseline screenshot]**  
 **[Insert Figure 13: Lighthouse after-optimisation screenshot]**
@@ -369,17 +339,8 @@ The main improvement came from reducing the amount of frontend code that needed 
 Declaration on the use of Generative AI:
 
 - We declare that we have used GenAI for copy-editing and improving the clarity of language in the report.
-- We declare that we have used GenAI for limited debugging support, code-quality suggestions, test ideas, and guidance on accessibility and sustainability reporting.
+- We declare that we have used GenAI for limited debugging support, code-quality suggestions, testing ideas, accessibility guidance, sustainability analysis, and small refactoring suggestions.
 
 Tool(s) used: ChatGPT  
-Parts affected: report drafting/editing, report structure, debugging guidance, testing ideas, accessibility guidance, and sustainability interpretation.  
+Parts affected: report drafting and editing, report structure, debugging guidance, testing ideas, accessibility guidance, sustainability interpretation, and limited code-quality suggestions.  
 How correctness was ensured: we checked the final report against the coursework brief, verified the report content against our own codebase, and validated implementation details through builds, tests, and manual review before submission.
-
----
-
-## Final Notes Before Exporting to PDF
-
-- Replace all figure placeholders with real screenshots or diagrams.
-- Keep the section page limits in mind when transferring this draft into Word.
-- Do not claim any sustainability improvement as implemented unless it was actually implemented and re-measured.
-- If the ER diagram still shows entities not present in the final code, update it before submission.

@@ -1,6 +1,6 @@
 # Implemented Site Structure
 
-This file provides an updated site structure diagram based on the **actual implemented frontend routes and pages**, while keeping the same layered style as your original site map.
+This file provides an updated site structure diagram based on the actual frontend routes and key page-level actions, while keeping the same layered style as the original site map.
 
 ## Mermaid Site Structure Diagram
 
@@ -20,22 +20,22 @@ flowchart TB
     end
 
     subgraph L4["Level 4 (Feature)"]
-        BR["Browse Rooms<br/>(Supports M2)"]
-        MB["My Bookings"]
+        BR["Browse Rooms / Smart Suggestions<br/>(Supports M2)"]
+        MB["My Bookings<br/>(Supports M4)"]
         BH["Booking History<br/>(Supports M4)"]
-        SP["Profile / Security<br/>(Account Settings)"]
+        SP["Profile / Security"]
 
         RM["Room Management<br/>(Supports M5)"]
         BM["Building Management"]
         EM["Equipment Management"]
         BQ["Booking Requests<br/>(Supports M6)"]
         UM["User Management"]
-        AP["Profile / Security<br/>(Admin Settings)"]
+        AP["Profile / Security"]
     end
 
     subgraph L5["Level 5 (Actions)"]
         RD["Room Detail / Booking Request<br/>(Supports M3)"]
-        SA["Availability Check / Review Display"]
+        AV["Availability Check / Review Display"]
         CB["Cancel Booking<br/>(Supports S1)"]
         LR["Leave Review<br/>(Supports C1)"]
         CPS["Change Password"]
@@ -66,7 +66,7 @@ flowchart TB
     AD --> AP
 
     BR --> RD
-    RD --> SA
+    RD --> AV
     MB --> CB
     BH --> LR
     SP --> CPS
@@ -79,31 +79,13 @@ flowchart TB
     AP --> CPA
 ```
 
-## Main Differences from the Original Site Structure
+## Notes for Figure 3
 
-1. The implemented system separates **My Bookings** and **Booking History** into two different pages rather than combining them into one feature branch.
-
-2. The student room journey is more detailed in the final implementation:
-   - `Browse Rooms`
-   - `Room Detail`
-   - `Booking Request`
-   - `Availability Check`
-   - room reviews visible on the detail page
-
-3. The administrator side is more complete than the original design because it now includes:
-   - `Building Management`
-   - `Equipment Management`
-   - `User Management`
-   - admin profile / security settings
-
-4. Both student and administrator roles now have a **Profile / Security** page, which was not fully represented in the original site map.
-
-5. The implemented system keeps `Login` and `Register` as separate routes, but they are grouped together in this diagram to preserve the original visual style.
+1. `Login` and `Register` remain separate routes in the code, but they are grouped together here to preserve the original layered visual style.
+2. The student journey is more detailed than the original design because room browsing is followed by a room detail page, booking request flow, availability checking, and review display.
+3. The implemented system separates `My Bookings` and `Booking History` into two different pages instead of combining them into one branch.
+4. The administrator structure is broader than the original design because it now includes dedicated pages for buildings, equipment, users, and profile/security.
 
 ## Suggested Figure Caption
 
-**Figure X. Updated site structure of the implemented Study Room Booking System.**
-
-## Suggested Report Paragraph
-
-The implemented site structure follows a role-based navigation model. Public users can access the landing page and authentication pages, after which the system redirects users to either the student or administrator dashboard according to their role. On the student side, the main features include room browsing, room detail and booking request pages, my bookings, booking history, and profile settings. On the administrator side, the implemented structure is broader than the original design and includes room management, building management, equipment management, booking request handling, user management, and profile settings. This updated site map reflects the actual implemented routes and user flows more accurately than the original design version.
+**Figure 3. Updated site structure of the implemented Study Room Booking System.**

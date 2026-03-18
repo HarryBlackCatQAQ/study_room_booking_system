@@ -1,100 +1,82 @@
+import { lazy, Suspense, type ReactNode } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
-import AdminLayout from '../components/layout/AdminLayout';
-import StudentLayout from '../components/layout/StudentLayout';
+import LoadingScreen from '../components/LoadingScreen';
 import ProtectedRoute from '../components/ProtectedRoute';
 import RoleGuard from '../components/RoleGuard';
-import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
-import BookingRequestsPage from '../pages/admin/BookingRequestsPage';
-import RoomManagementPage from '../pages/admin/RoomManagementPage';
-import UserManagementPage from '../pages/admin/UserManagementPage';
-import LoginPage from '../pages/auth/LoginPage';
-import RegisterPage from '../pages/auth/RegisterPage';
-import LandingPage from '../pages/shared/LandingPage';
-import NotFoundPage from '../pages/shared/NotFoundPage';
-import ProfilePage from '../pages/shared/ProfilePage';
-import BookingHistoryPage from '../pages/student/BookingHistoryPage';
-import MyBookingsPage from '../pages/student/MyBookingsPage';
-import RoomDetailPage from '../pages/student/RoomDetailPage';
-import RoomsPage from '../pages/student/RoomsPage';
-import StudentDashboardPage from '../pages/student/StudentDashboardPage';
-import BuildingManagementPage from '../pages/admin/BuildingManagementPage';
-import EquipmentManagementPage from '../pages/admin/EquipmentManagementPage';
+
+const AdminLayout = lazy(() => import('../components/layout/AdminLayout'));
+const StudentLayout = lazy(() => import('../components/layout/StudentLayout'));
+const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'));
+const BookingRequestsPage = lazy(() => import('../pages/admin/BookingRequestsPage'));
+const RoomManagementPage = lazy(() => import('../pages/admin/RoomManagementPage'));
+const UserManagementPage = lazy(() => import('../pages/admin/UserManagementPage'));
+const BuildingManagementPage = lazy(() => import('../pages/admin/BuildingManagementPage'));
+const EquipmentManagementPage = lazy(() => import('../pages/admin/EquipmentManagementPage'));
+const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
+const LandingPage = lazy(() => import('../pages/shared/LandingPage'));
+const NotFoundPage = lazy(() => import('../pages/shared/NotFoundPage'));
+const ProfilePage = lazy(() => import('../pages/shared/ProfilePage'));
+const BookingHistoryPage = lazy(() => import('../pages/student/BookingHistoryPage'));
+const MyBookingsPage = lazy(() => import('../pages/student/MyBookingsPage'));
+const RoomDetailPage = lazy(() => import('../pages/student/RoomDetailPage'));
+const RoomsPage = lazy(() => import('../pages/student/RoomsPage'));
+const StudentDashboardPage = lazy(() => import('../pages/student/StudentDashboardPage'));
+
+function lazyRoute(element: ReactNode, text = 'Loading page...') {
+  return (
+    <Suspense fallback={<LoadingScreen text={text} />}>
+      {element}
+    </Suspense>
+  );
+}
 
 // Define the application routes using React Router
 export const router = createBrowserRouter([
-  // Define the root route
-
   // the landing page
-  { path: '/', element: <LandingPage /> },
+  { path: '/', element: lazyRoute(<LandingPage />, 'Loading landing page...') },
 
-  // the login pages
-  { path: '/login', element: <LoginPage /> },
+  // the login page
+  { path: '/login', element: lazyRoute(<LoginPage />, 'Loading login page...') },
 
   // the register page
-  { path: '/register', element: <RegisterPage /> },
+  { path: '/register', element: lazyRoute(<RegisterPage />, 'Loading registration page...') },
 
   // the protected routes
   {
-    // if the user is authenticated, render the child routes
     element: <ProtectedRoute />,
     children: [
       {
-        // the student routes
         element: <RoleGuard role="student" />,
         children: [
           {
             path: '/student',
-            element: <StudentLayout />,
+            element: lazyRoute(<StudentLayout />, 'Loading workspace...'),
             children: [
-              // the student dashboard and set the default path
-              { index: true, element: <StudentDashboardPage /> },
-
-              // the student rooms page
-              { path: 'rooms', element: <RoomsPage /> },
-
-              // the student room detail page
-              { path: 'rooms/:id', element: <RoomDetailPage /> },
-
-              // the student my bookings page
-              { path: 'bookings', element: <MyBookingsPage /> },
-
-              // the student booking history page
-              { path: 'history', element: <BookingHistoryPage /> },
-
-              // the student profile page
-              { path: 'profile', element: <ProfilePage /> },
+              { index: true, element: lazyRoute(<StudentDashboardPage />, 'Loading dashboard...') },
+              { path: 'rooms', element: lazyRoute(<RoomsPage />, 'Loading rooms...') },
+              { path: 'rooms/:id', element: lazyRoute(<RoomDetailPage />, 'Loading room details...') },
+              { path: 'bookings', element: lazyRoute(<MyBookingsPage />, 'Loading bookings...') },
+              { path: 'history', element: lazyRoute(<BookingHistoryPage />, 'Loading booking history...') },
+              { path: 'profile', element: lazyRoute(<ProfilePage />, 'Loading profile...') },
             ],
           },
         ],
       },
       {
-        // the admin routes
         element: <RoleGuard role="admin" />,
         children: [
           {
             path: '/admin',
-            element: <AdminLayout />,
+            element: lazyRoute(<AdminLayout />, 'Loading admin workspace...'),
             children: [
-              // the admin dashboard and set the default path
-              { index: true, element: <AdminDashboardPage /> },
-
-              // the admin room management page
-              { path: 'rooms', element: <RoomManagementPage /> },
-              
-              // the admin building management page
-              { path: 'buildings', element: <BuildingManagementPage /> },
-
-              // the admin equipment management page
-              { path: 'equipments', element: <EquipmentManagementPage /> },
-
-              // the admin booking requests page
-              { path: 'requests', element: <BookingRequestsPage /> },
-
-              // the admin user management page
-              { path: 'users', element: <UserManagementPage /> },
-
-              // the admin profile page
-              { path: 'profile', element: <ProfilePage /> },
+              { index: true, element: lazyRoute(<AdminDashboardPage />, 'Loading admin dashboard...') },
+              { path: 'rooms', element: lazyRoute(<RoomManagementPage />, 'Loading room management...') },
+              { path: 'buildings', element: lazyRoute(<BuildingManagementPage />, 'Loading building management...') },
+              { path: 'equipments', element: lazyRoute(<EquipmentManagementPage />, 'Loading equipment management...') },
+              { path: 'requests', element: lazyRoute(<BookingRequestsPage />, 'Loading booking requests...') },
+              { path: 'users', element: lazyRoute(<UserManagementPage />, 'Loading user management...') },
+              { path: 'profile', element: lazyRoute(<ProfilePage />, 'Loading profile...') },
             ],
           },
         ],
@@ -103,5 +85,5 @@ export const router = createBrowserRouter([
   },
 
   // the not found page
-  { path: '*', element: <NotFoundPage /> },
+  { path: '*', element: lazyRoute(<NotFoundPage />, 'Loading page...') },
 ]);

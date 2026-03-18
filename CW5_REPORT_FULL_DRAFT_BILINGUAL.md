@@ -1,4 +1,4 @@
-# CW5 Report Full Draft Bilingual Version
+﻿# CW5 Report Full Draft Bilingual Version
 
 > English text is the suggested report content for submission.  
 > Chinese text is for reference only and should not be submitted as part of the final report unless your course explicitly allows bilingual content.
@@ -235,25 +235,21 @@ This data design supports the full workflow of authentication, room browsing, bo
 
 **[Insert Figure 3: Site Map]**
 
-The site structure is organised around role-based navigation.
+The implemented site structure keeps the original role-based layout. Public users first access the landing page and the login / register pages, and are then redirected to either the student dashboard or the administrator dashboard.
 
-On the student side, users can access the landing page, login and registration pages, student dashboard, room browsing page, room detail page, my bookings page, booking history page, and profile page.
+Compared with the original design, the student side now separates Browse Rooms, My Bookings, Booking History, and Profile, and also includes room detail, availability check, booking, cancellation, and review actions. On the administrator side, Room Management and Booking Requests are retained, while Building Management, Equipment Management, User Management, and Profile / Security pages are added.
 
-On the administrator side, authenticated admin users can access the admin dashboard, booking request management page, room management page, building management page, equipment management page, user management page, and profile page.
-
-This structure keeps the student journey simple while also separating administrative tasks into focused management pages.
+This updated structure remains clear and simple, while reflecting the implemented routes more accurately than the original design version.
 
 **中文参考**
 
 **[插入图 3：网站地图]**
 
-网站结构基于角色导航进行组织。
+最终实现的网站结构保留了原始设计中基于角色的分层布局。公共用户首先访问首页以及登录 / 注册页面，随后系统会根据用户角色跳转到学生仪表板或管理员仪表板。
 
-在学生端，用户可以访问首页、登录和注册页面、学生仪表板、房间浏览页、房间详情页、我的预约页、预约历史页以及个人资料页。
+与原始设计相比，学生端现在将房间浏览、我的预约、预约历史和个人资料分为独立页面，并补充了房间详情、可用性检查、预约、取消预约和评价等操作。管理员端则在保留房间管理和预约请求页面的基础上，新增了建筑管理、设备管理、用户管理以及个人资料 / 安全设置页面。
 
-在管理员端，经过认证的管理员可以访问管理员仪表板、预约请求管理页、房间管理页、建筑管理页、设备管理页、用户管理页以及个人资料页。
-
-这种结构使学生端使用流程保持简洁，同时也将管理员任务拆分为更聚焦的管理页面。
+整体而言，更新后的站点结构在保持清晰简洁的同时，也比原始设计更准确地反映了实际实现的路由和用户流程。
 
 ### 2.6 User Interface Design
 ### 2.6 用户界面设计
@@ -356,54 +352,52 @@ These additions make the system more complete from an administrative perspective
 
 **English**
 
-The final system uses a separated frontend and backend architecture.
+The implemented system uses a multi-service web architecture. The frontend is a React single-page application built with **React**, **Vite**, **TypeScript**, **React Router**, **Axios**, and **Ant Design**, and it handles client-side routing, forms, and asynchronous UI updates.
 
-The frontend is implemented as a React single-page application using **React**, **Vite**, **TypeScript**, **React Router**, **Axios**, and **Ant Design**. This frontend is responsible for rendering the user interface, handling client-side routing, validating user input, and performing asynchronous API requests.
+The main backend is implemented with **Django** and **Django REST Framework**, which provide API routing, business logic, database access, role-based permissions, and JWT-based authentication. The deployed architecture also includes **Nginx** as the public entry point, a **PostgreSQL** primary database with read replicas, and a **Redis Cluster** used for caching and locking.
 
-The backend is implemented using **Django** and **Django REST Framework**. It provides the application’s main business logic, API endpoints, database interaction, role-based permissions, and authentication features. Authentication is handled using JWT tokens so that protected API endpoints can be accessed securely from the frontend.
-
-Beyond the core Django backend, the project also includes two supporting services. A **Java gRPC service** provides room recommendation functionality, and a **Go gRPC service** provides availability searching for requested time ranges. These services are called by Django and exposed to the frontend through API endpoints.
+In addition, Django integrates with two supporting gRPC services: a **Java** service for room recommendation and a **Go** service for time-slot availability checking. This makes the final implementation broader than a simple two-tier web application while still keeping Django as the core application backend.
 
 **中文参考**
 
-最终系统采用前后端分离架构。
+最终实现采用了多服务 Web 架构。前端是使用 **React**、**Vite**、**TypeScript**、**React Router**、**Axios** 和 **Ant Design** 构建的单页应用，负责客户端路由、表单交互和异步界面更新。
 
-前端实现为 React 单页应用，使用了 **React**、**Vite**、**TypeScript**、**React Router**、**Axios** 和 **Ant Design**。前端负责渲染用户界面、处理客户端路由、校验用户输入以及执行异步 API 请求。
+核心后端由 **Django** 和 **Django REST Framework** 实现，负责 API 路由、业务逻辑、数据库访问、基于角色的权限控制以及 JWT 认证。部署层面还包括作为统一入口的 **Nginx**、带只读副本的 **PostgreSQL** 主数据库，以及用于缓存和锁机制的 **Redis Cluster**。
 
-后端使用 **Django** 和 **Django REST Framework** 实现。它提供应用的核心业务逻辑、API 端点、数据库交互、基于角色的权限控制以及认证功能。认证通过 JWT token 完成，从而使前端可以安全地访问受保护的 API。
-
-除了核心 Django 后端之外，项目还包括两个辅助服务。一个 **Java gRPC 服务** 用于房间推荐功能，另一个 **Go gRPC 服务** 用于按时间范围查询房间可用性。这些服务由 Django 调用，并通过 API 端点向前端提供结果。
+此外，Django 还集成了两个 gRPC 辅助服务：一个基于 **Java** 的房间推荐服务，以及一个基于 **Go** 的时间段可用性查询服务。因此，最终系统比简单的前后端两层架构更完整，同时仍然以 Django 作为核心应用后端。
 
 ### 3.2 Main Components
-### 3.2 主要组件
+### 3.2 主要组成部分
 
 **English**
 
 The implemented system contains the following main components:
 
 - **Frontend application:** student and administrator interfaces built with React.
-- **Authentication module:** registration, login, profile, and password change endpoints.
-- **Room management module:** room listing, room detail, room creation, update, and deletion.
-- **Booking module:** booking creation, booking listing, cancellation, approval, and rejection.
-- **Review module:** room review listing and review submission after completed approved bookings.
-- **Administrative management module:** building, equipment, and user account management.
-- **Smart services module:** room recommendation and availability search via gRPC-integrated backend endpoints.
+- **Django REST API backend:** core business logic, permissions, authentication, and data access.
+- **Authentication and profile module:** student registration, login, profile retrieval, and password change.
+- **Room resource management module:** rooms, buildings, and equipment data management.
+- **Booking lifecycle module:** booking creation, approval, rejection, cancellation, and expired-pending synchronisation.
+- **Review module:** room review listing and review submission after eligible completed bookings.
+- **Smart services module:** room recommendation and availability search through gRPC-integrated backend endpoints.
+- **Infrastructure layer:** Nginx, PostgreSQL primary/replica deployment, and Redis-based caching support.
 
 Each major feature is separated into reusable pages, API modules, backend apps, serializers, and service layers, which helps keep the implementation organised and maintainable.
 
 **中文参考**
 
-最终实现的系统包含以下主要组件：
+最终系统主要由以下部分组成：
 
 - **前端应用：** 使用 React 构建的学生端和管理员端界面。
-- **认证模块：** 包括注册、登录、个人资料和密码修改接口。
-- **房间管理模块：** 包括房间列表、房间详情、房间创建、更新和删除。
-- **预约模块：** 包括预约创建、预约列表、取消、批准和拒绝。
-- **评价模块：** 包括房间评价列表，以及对已完成且已批准预约的评价提交。
-- **管理模块：** 包括建筑、设备和用户账户管理。
+- **Django REST API 后端：** 负责核心业务逻辑、权限控制、认证和数据访问。
+- **认证与个人资料模块：** 包括学生注册、登录、个人资料查看和密码修改。
+- **房间资源管理模块：** 包括房间、建筑和设备数据管理。
+- **预约生命周期模块：** 包括预约创建、审批、拒绝、取消，以及过期待处理预约的同步处理。
+- **评价模块：** 包括房间评价列表以及对符合条件的已完成预约提交评价。
 - **智能服务模块：** 通过集成 gRPC 后端端点实现房间推荐和可用性查询。
+- **基础设施层：** 包括 Nginx、PostgreSQL 主从部署，以及基于 Redis 的缓存支持。
 
-每个主要功能都被拆分为可复用页面、API 模块、后端 app、serializer 和 service 层，这有助于让实现保持清晰且易于维护。
+每个主要功能都被拆分为可复用页面、API 模块、后端 app、serializer 和 service 层，从而使实现结构更清晰，也更便于维护。
 
 ### 3.3 Key Features
 ### 3.3 核心功能
@@ -411,46 +405,46 @@ Each major feature is separated into reusable pages, API modules, backend apps, 
 **English**
 
 **User Authentication (M1)**  
-User authentication is implemented using Django-based backend logic and JWT authentication for API access. Students and administrators can register and log in, and the system redirects authenticated users to the correct dashboard according to their role.
+Students can register through the public registration page, and both students and administrators can log in through JWT-based authentication. After login, the system redirects users to the correct dashboard according to role. Administrator accounts are managed through the administrative user-management workflow rather than public self-registration.
 
 **Room Browsing (M2)**  
-Students can browse rooms on the room listing page and view room details such as building, location, capacity, and equipment. The interface also supports filtering and searching to help users find a suitable room more quickly.
+Students can browse rooms through search, filters, pagination, and a smart suggestion panel, then open room detail pages showing building information, capacity, equipment, ratings, and reviews.
 
 **Room Booking (M3)**  
-Students can submit a booking request by choosing a room, date, start time, and end time. The backend validates the request and prevents overlapping bookings.
+From the room detail page, students can check availability for a selected time range and submit a booking request. The backend validates booking rules and prevents overlapping reservations.
 
 **Booking Tracking and History (M4)**  
-Students can view their current booking requests and booking history. The history page also allows completed approved bookings to be reviewed.
+`My Bookings` shows pending and upcoming requests and supports cancellation. `Booking History` stores completed, rejected, and cancelled records and allows eligible completed bookings to receive reviews.
 
 **Room Management (M5)**  
-Administrators can create, update, and delete room records through dedicated management pages.
+Administrators can create, edit, and delete room records. The implemented system also extends this management flow to related building and equipment data through dedicated pages.
 
 **Booking Approval (M6)**  
-Administrators can review booking requests and approve or reject them. Approved and rejected requests are recorded with status updates.
+Administrators can review booking requests and approve or reject them through the booking requests page. In addition, expired pending bookings are synchronised and automatically rejected by backend lifecycle logic.
 
-In addition to the core must-have requirements, the final system also includes booking cancellation, room reviews, building management, equipment management, user management, room recommendation, and availability checking.
+In addition to the core must-have requirements, the final system also includes profile management, password change, room reviews, building management, equipment management, user management, room recommendation, and availability checking.
 
 **中文参考**
 
 **用户认证（M1）**  
-用户认证通过基于 Django 的后端逻辑和 JWT API 认证实现。学生和管理员都可以注册和登录，系统会根据角色将认证成功的用户跳转到正确的仪表板页面。
+学生可以通过公开注册页注册账户，学生和管理员都可以使用基于 JWT 的认证方式登录。登录后，系统会根据用户角色跳转到对应的仪表板。管理员账户不是通过公开注册创建，而是通过管理员用户管理流程维护。
 
 **房间浏览（M2）**  
-学生可以在房间列表页浏览房间，并查看建筑、位置、容量和设备等详细信息。界面还支持筛选和搜索，帮助用户更快找到合适的房间。
+学生可以通过搜索、筛选、分页和智能推荐面板浏览房间，并进入房间详情页查看建筑信息、容量、设备、评分和评论。
 
 **房间预约（M3）**  
-学生可以通过选择房间、日期、开始时间和结束时间来提交预约请求。后端会验证该请求，并防止时间冲突的重叠预约。
+学生可以在房间详情页中先查询指定时间段的可用性，再提交预约请求。后端会校验预约规则，并阻止时间冲突的重复预约。
 
 **预约跟踪与历史（M4）**  
-学生可以查看当前预约请求和历史预约。历史页面还支持对已完成且已批准的预约进行评价。
+`My Bookings` 用于查看待处理和即将到来的预约，并支持取消。`Booking History` 用于保存已完成、已拒绝和已取消的记录，并允许符合条件的已完成预约提交评价。
 
 **房间管理（M5）**  
-管理员可以通过独立管理页面创建、更新和删除房间记录。
+管理员可以创建、编辑和删除房间记录。最终实现还通过独立页面将这一管理流程扩展到了建筑和设备数据。
 
 **预约审批（M6）**  
-管理员可以审核预约请求并进行批准或拒绝。系统会记录批准和拒绝后的状态变化。
+管理员可以在预约请求页面中审核预约并执行批准或拒绝操作。此外，后端的预约生命周期逻辑还会同步并自动拒绝过期的待处理预约。
 
-除了这些核心必做功能之外，最终系统还实现了取消预约、房间评价、建筑管理、设备管理、用户管理、房间推荐和房间可用性查询。
+除核心必做功能外，最终系统还实现了个人资料管理、密码修改、房间评价、建筑管理、设备管理、用户管理、房间推荐和可用性查询等功能。
 
 ### 3.4 Front-end Interactivity
 ### 3.4 前端交互性
@@ -459,21 +453,17 @@ In addition to the core must-have requirements, the final system also includes b
 
 The application clearly demonstrates client-side interactivity beyond static page rendering.
 
-The React frontend provides dynamic room filtering and pagination, form validation, asynchronous API requests, role-based route protection, and live interface updates after user actions such as login, booking creation, or request approval. The booking forms, login forms, and management forms all validate required input before submission.
+The React frontend supports dynamic room filtering and pagination, role-based route protection, validation on authentication, booking, and management forms, modal-based booking and review flows, and live feedback after asynchronous actions such as login, booking submission, approval, or review creation.
 
-The system also includes two interactive smart features. The room recommendation interface submits form data asynchronously and displays suggested rooms based on the selected criteria. The availability checking interface allows users to query a time range and immediately view available rooms without requiring a full page reload.
-
-These behaviours provide clear evidence that the application meets the coursework requirement for frontend interactivity.
+The recommendation panel and availability checker both send asynchronous requests and update the interface without requiring a full page reload. These behaviours provide clear evidence that the application meets the coursework requirement for frontend interactivity.
 
 **中文参考**
 
-该应用清楚地展示了超越静态页面渲染的客户端交互性。
+该应用清楚地体现了超越静态页面渲染的前端交互能力。
 
-React 前端提供了动态房间筛选与分页、表单验证、异步 API 请求、基于角色的路由保护，以及在登录、创建预约或审批请求后对界面的实时更新。预约表单、登录表单和管理表单都会在提交前验证必填输入。
+React 前端支持动态房间筛选与分页、基于角色的路由保护、认证表单/预约表单/管理表单的输入校验、基于弹窗的预约和评价流程，以及登录、提交预约、审批和提交评价等异步操作后的即时界面反馈。
 
-系统还包括两个交互式智能功能。房间推荐界面会异步提交表单数据，并根据所选条件展示推荐房间。可用性查询界面允许用户输入时间范围并立即查看可用房间，而不需要整页刷新。
-
-这些行为清楚表明该应用满足课程对前端交互性的要求。
+推荐面板和可用性查询模块都会异步发送请求，并在不刷新整页的情况下更新界面。这些行为清楚表明该系统满足课程对前端交互性的要求。
 
 ### 3.5 Look and Feel
 ### 3.5 界面观感
@@ -482,17 +472,17 @@ React 前端提供了动态房间筛选与分页、表单验证、异步 API 请
 
 The interface was designed to be polished, consistent, and responsive.
 
-The project uses Ant Design components together with custom CSS for layouts, forms, cards, tables, navigation, status displays, and page sections. Shared layout components are used for both student and administrator views, helping the system maintain a consistent visual language.
+The project uses Ant Design components together with custom CSS for dashboards, cards, tables, navigation, status displays, and forms. Shared student and administrator layout components help maintain a consistent visual language across the system.
 
-The colour palette, spacing, typography, and dashboard layout were designed to make the interface more refined than the original wireframes. Responsive CSS is also used so that major pages, particularly authentication and dashboard layouts, adapt to smaller screens. As a result, the final application provides a more professional and coherent user experience.
+Responsive CSS rules and flexible layouts allow key pages such as the authentication screens, dashboards, room pages, and record tables to adapt to smaller screens. As a result, the final application provides a more professional and coherent user experience than the original wireframes.
 
 **中文参考**
 
-界面被设计为更精致、一致且具有响应式效果。
+界面的设计目标是精致、一致且具有响应式表现。
 
-项目使用了 Ant Design 组件，并结合自定义 CSS 来实现布局、表单、卡片、表格、导航、状态显示和页面分区。学生端和管理员端都使用共享布局组件，这有助于系统保持统一的视觉语言。
+项目使用了 Ant Design 组件，并结合自定义 CSS 实现仪表板、卡片、表格、导航、状态展示和表单等界面元素。学生端和管理员端共享布局组件，从而保持统一的视觉语言。
 
-颜色方案、间距、字体排版以及仪表板布局都经过设计，使最终界面比最初线框图更精致。项目还使用响应式 CSS，让主要页面，尤其是认证页和仪表板布局，能够适应较小屏幕。因此，最终应用提供了更专业且更统一的用户体验。
+响应式 CSS 规则和灵活布局使认证页面、仪表板、房间页面和记录表格等关键页面能够适配较小屏幕。因此，最终应用在用户体验上比最初的线框图更加完整和专业。
 
 ### 3.6 Code Quality and Organisation
 ### 3.6 代码质量与组织结构
@@ -501,17 +491,17 @@ The colour palette, spacing, typography, and dashboard layout were designed to m
 
 The codebase is organised to support separation of concerns and reusability.
 
-On the frontend, routing, API access, reusable components, page components, styles, and utility functions are separated into different modules. On the backend, functionality is divided into dedicated Django apps including users, rooms, bookings, reviews, and smart services.
+On the frontend, routes, page components, API clients, layouts, reusable components, styles, and types are separated into dedicated modules. API configuration uses a configurable base URL and a token-refresh interceptor rather than hard-coded requests inside UI components.
 
-Reusable serializers, API client modules, and shared layout components reduce duplication and make the code easier to maintain. API configuration is also kept separate from page code so that frontend requests are not hard-coded directly inside UI components. This structure helps the implementation satisfy the coursework expectations for readable and well-organised code.
+On the backend, functionality is divided into dedicated Django apps including `users`, `rooms`, `bookings`, `reviews`, and `smart_services`, with serializers, services, permissions, database routing, and cache configuration kept in separate modules. Route-level lazy loading was also introduced so that large page modules are loaded only when needed. This structure supports maintainability, reuse, and easier testing.
 
 **中文参考**
 
-代码库的组织方式支持关注点分离和可复用性。
+代码库的组织方式强调关注点分离和可复用性。
 
-在前端部分，路由、API 访问、可复用组件、页面组件、样式和工具函数都被拆分到不同模块中。在后端部分，功能被划分到不同的 Django app 中，包括 users、rooms、bookings、reviews 和 smart services。
+在前端部分，路由、页面组件、API 客户端、布局组件、可复用组件、样式和类型定义都被拆分到独立模块中。API 配置采用可配置的基础地址和 token 刷新拦截器，而不是把请求硬编码在 UI 组件内部。
 
-可复用的 serializer、API 客户端模块和共享布局组件减少了重复代码，也使项目更易维护。API 配置也与页面代码分离，从而避免把前端请求硬编码到 UI 组件中。这种结构有助于满足课程对代码可读性和组织性的要求。
+在后端部分，功能被划分到独立的 Django app 中，包括 `users`、`rooms`、`bookings`、`reviews` 和 `smart_services`，并将 serializer、service、permission、数据库路由和缓存配置进一步拆分到单独模块。项目还引入了按路由懒加载，使大型页面模块只在需要时加载。这样的结构有助于维护、复用和测试。
 
 ---
 
@@ -520,40 +510,26 @@ Reusable serializers, API client modules, and shared layout components reduce du
 
 **English**
 
-Testing was carried out using a combination of automated API tests and manual browser-based testing.
+Testing combined automated API tests with manual browser-based verification.
 
-The automated tests were implemented using Django REST Framework’s testing tools. These tests focus on important business rules and API behaviour across the authentication, booking, room, and review modules.
+The automated suite was written using Django REST Framework testing tools and covers authentication, profile retrieval, password change, room list and detail retrieval, admin room permissions, booking creation, booking conflict prevention, cancellation, booking approval and rejection, automatic rejection of expired pending bookings, review submission rules, and administrative user management.
 
-The automated test suite covers the following areas:
-
-- user registration and login
-- invalid login handling
-- profile retrieval and password change
-- room list and room detail retrieval
-- admin room creation permissions
-- booking creation
-- booking conflict prevention
-- booking cancellation
-- admin booking approval and rejection
-- auto-rejection of expired pending bookings
-- review creation rules
-- restrictions on reviewing incomplete or already reviewed bookings
-- administrative user management behaviour
-
-The automated tests were run on **17 March 2026** using the following command:
+The automated test run used in this report was executed on **17 March 2026** with the following command:
 
 ```bash
 ./.venv/bin/python backend/manage.py test bookings reviews users rooms smart_services
 ```
 
-The result was:
+The recorded result was:
 
 ```text
 Ran 42 tests in 90.226s
 OK
 ```
 
-In addition to the automated tests, manual testing was used to verify the complete user journey in the browser. This included logging in, browsing rooms, submitting a booking request, approving or rejecting a booking as an administrator, viewing booking history, and submitting a room review after a completed booking.
+The `smart_services` app was included in the command so the full backend suite ran together, but the recommendation and availability flows were mainly verified through manual end-to-end testing.
+
+Manual testing checked the main user journeys in the browser, including student registration and login, room browsing, room detail and availability checking, booking submission, booking cancellation, administrator approval or rejection, booking history viewing, and review submission after an eligible completed booking.
 
 Together, these automated and manual checks provide evidence that the implemented system behaves correctly for the main coursework requirements.
 
@@ -561,42 +537,28 @@ Together, these automated and manual checks provide evidence that the implemente
 
 **中文参考**
 
-测试通过自动化 API 测试和基于浏览器的手动测试相结合的方式完成。
+测试采用了自动化 API 测试和基于浏览器的人工验证相结合的方式。
 
-自动化测试使用 Django REST Framework 的测试工具实现。这些测试主要关注认证、预约、房间和评价模块中的重要业务规则与 API 行为。
+自动化测试使用 Django REST Framework 的测试工具实现，覆盖了认证、个人资料获取、密码修改、房间列表与详情获取、管理员房间权限、预约创建、预约冲突防止、取消预约、预约审批与拒绝、过期待处理预约的自动拒绝、评价提交规则以及管理员用户管理等内容。
 
-自动化测试覆盖以下内容：
-
-- 用户注册和登录
-- 无效登录处理
-- 个人资料获取与密码修改
-- 房间列表和房间详情获取
-- 管理员创建房间权限
-- 预约创建
-- 预约冲突防止
-- 预约取消
-- 管理员审批和拒绝预约
-- 过期 pending 预约的自动拒绝
-- 评价创建规则
-- 对未完成或已评价预约的限制
-- 管理员用户管理行为
-
-自动化测试于 **2026 年 3 月 17 日** 通过以下命令运行：
+本报告引用的自动化测试运行于 **2026 年 3 月 17 日**，使用以下命令：
 
 ```bash
 ./.venv/bin/python backend/manage.py test bookings reviews users rooms smart_services
 ```
 
-测试结果为：
+记录结果为：
 
 ```text
 Ran 42 tests in 90.226s
 OK
 ```
 
-除了自动化测试之外，我们还进行了手动测试，以验证浏览器中的完整用户流程。这包括登录、浏览房间、提交预约请求、以管理员身份批准或拒绝预约、查看预约历史，以及在预约完成后提交房间评价。
+`smart_services` app 被包含在测试命令中以统一运行整个后端测试套件，但推荐和可用性查询流程主要通过人工端到端测试进行验证。
 
-这些自动化和手动测试共同证明，最终实现的系统能够正确满足课程中的主要功能要求。
+人工测试覆盖了浏览器中的主要用户流程，包括学生注册与登录、浏览房间、查看房间详情与可用性、提交预约、取消预约、管理员审批或拒绝预约、查看预约历史，以及在符合条件的已完成预约后提交评价。
+
+这些自动化和人工测试共同说明，最终系统能够正确满足课程要求中的主要功能。
 
 **[插入图 8：自动化测试输出截图]**
 
@@ -607,67 +569,55 @@ OK
 
 **English**
 
-The accessibility plan created during the design phase was applied to the final system through several practical interface improvements. The improvements were mainly implemented on the login page, booking-related forms, and other important user input flows.
+The accessibility plan from the design phase was applied to the final system through several concrete improvements on key pages such as login, registration, booking, profile, and management forms.
 
 ### 5.1 Keyboard Accessibility
 
-The system supports keyboard-based interaction for important user tasks. Users can move through form fields, buttons, and links using the keyboard, and actions such as login and booking submission can be completed without relying on a mouse.
-
-This improves usability for keyboard-only users and supports more accessible interaction across the interface.
+Important workflows can be completed by keyboard. Users can move through links, buttons, inputs, selects, and date pickers without relying on a mouse, and tasks such as login, registration, booking submission, and management-form interaction remain usable through standard keyboard navigation.
 
 **[Insert Figure 9: Screenshot showing keyboard navigation or focused element]**
 
 ### 5.2 Visible Focus Indicators
 
-Visible focus styling was added so that users can clearly see which interactive element is currently selected when navigating by keyboard. Buttons, input fields, select components, and date/time pickers all display a clear focus outline.
-
-This change directly supports the accessibility plan by making keyboard navigation easier to follow.
+Visible focus styling was added to improve keyboard usability. Buttons, input fields, select controls, and picker components show a clear focus outline, making it easier for users to see which element is currently active.
 
 **[Insert Figure 10: Screenshot showing visible focus outline]**
 
 ### 5.3 Clear Labels and Input Guidance
 
-Forms across the system use clear labels and supporting guidance. For example, the login page includes labelled fields for **Username** and **Password**, and the booking form includes labelled fields for **Date**, **Start Time**, and **End Time**. Some fields also include placeholders or validation messages to help users understand what information is expected.
-
-This reduces user error and improves accessibility for users who need clearer form semantics.
+Forms across the system use clear labels and supporting guidance. Login, registration, booking, password-change, and management forms all use labelled fields, and several inputs also provide placeholders or validation messages to help users understand what information is required.
 
 **[Insert Figure 11: Screenshot showing labelled login or booking form]**
 
 ### 5.4 Summary
 
-These improvements show that the accessibility plan was applied in the implemented system rather than remaining only at the design stage. The changes focus on practical usability improvements that are visible in the final user interface and supported by evidence from key pages.
+These improvements show that the accessibility plan was implemented in the final system rather than remaining only at the design stage. The changes focus on visible, practical usability improvements that can be demonstrated through screenshots from the implemented interface.
 
 **中文参考**
 
-设计阶段制定的无障碍计划在最终系统中通过若干实际的界面改进得到了落实。这些改进主要体现在登录页面、与预约相关的表单以及其他重要用户输入流程中。
+设计阶段提出的无障碍计划在最终系统中得到了落实，具体体现在登录、注册、预约、个人资料和管理表单等关键页面的多项改进中。
 
 ### 5.1 键盘可访问性
 
-系统支持对重要用户任务的键盘操作。用户可以通过键盘在表单字段、按钮和链接之间移动，并且像登录和提交预约这样的操作都可以在不依赖鼠标的情况下完成。
+重要流程可以仅通过键盘完成。用户可以在链接、按钮、输入框、下拉选择框和日期选择器之间移动，而不依赖鼠标；登录、注册、提交预约和管理表单等任务都可以通过标准键盘导航完成。
 
-这提升了仅使用键盘用户的可用性，也使整个界面的交互更加无障碍。
-
-**[插入图 9：显示键盘导航或焦点元素的截图]**
+**[插入图 9：键盘导航或焦点元素截图]**
 
 ### 5.2 可见焦点指示
 
-系统增加了可见的焦点样式，使用户在使用键盘导航时可以清楚看到当前选中的交互元素。按钮、输入框、选择组件以及日期 / 时间选择器都会显示清晰的焦点边框。
+系统增加了明显的焦点样式来提升键盘可用性。按钮、输入框、选择控件和日期选择组件都会显示清晰的焦点轮廓，使用户更容易判断当前处于激活状态的元素。
 
-这项改动直接响应了无障碍计划，使键盘导航更容易追踪。
+**[插入图 10：可见焦点轮廓截图]**
 
-**[插入图 10：显示焦点边框的截图]**
+### 5.3 清晰的标签与输入引导
 
-### 5.3 清晰的标签和输入引导
+系统中的表单都使用了清晰的标签和辅助提示。登录、注册、预约、修改密码和管理表单均使用了明确标注的字段，部分输入框还带有占位提示或校验信息，帮助用户理解需要填写的内容。
 
-系统中的表单都使用了清晰的标签和辅助说明。例如，登录页面包含 **Username** 和 **Password** 标签，预约表单包含 **Date**、**Start Time** 和 **End Time** 标签。部分字段还带有 placeholder 或验证信息，以帮助用户理解需要输入什么内容。
-
-这减少了用户输入错误，也为需要更清晰表单语义的用户提升了可访问性。
-
-**[插入图 11：显示登录或预约表单标签的截图]**
+**[插入图 11：带标签的登录或预约表单截图]**
 
 ### 5.4 总结
 
-这些改进表明，无障碍计划已经在最终系统中被真正实现，而不只是停留在设计阶段。这些变化聚焦于最终界面中可见、可验证的实际可用性改进，并可以通过关键页面截图进行证明。
+这些改进说明无障碍计划已经在最终系统中真正落地，而不是只停留在设计阶段。相关变化聚焦于可见且可验证的实际可用性提升，并能够通过实现界面的截图加以证明。
 
 ---
 
@@ -676,102 +626,92 @@ These improvements show that the accessibility plan was applied in the implement
 
 **English**
 
-The sustainability-related performance of the application was evaluated using **Google Lighthouse**. The evaluation focused on user-facing pages because the coursework brief requires performance evidence for at least two pages, including the homepage and one core feature page.
+The sustainability-related performance evaluation was carried out using **Google Lighthouse 13.0.3**. To keep the measurement environment consistent, the tests were run on **18 March 2026** against a local production preview built from the submitted frontend code.
 
 ### 6.1 Tool and Pages Tested
 
-The following pages were tested on **17 March 2026**:
+The following two pages were tested:
 
-- Homepage: `http://ttz3305012.uk/`
-- Login page: `http://ttz3305012.uk/login`
+- Homepage: `http://127.0.0.1:4173/`
+- Login page: `http://127.0.0.1:4173/login`
 
-These pages were selected because they are public entry points to the application and represent important user-facing parts of the system.
+These pages were selected because they represent the public entry points of the application and satisfy the coursework requirement to measure at least two user-facing pages.
 
 ### 6.2 Baseline Measurement
 
-The baseline Lighthouse results were:
+The baseline Lighthouse results before the optimisation were:
 
 | Page | Performance | Accessibility | Best Practices | SEO |
 | --- | ---: | ---: | ---: | ---: |
-| Homepage | 46 | 98 | 78 | 83 |
-| Login page | 40 | 94 | 78 | 82 |
+| Homepage | 70 | 98 | 100 | 83 |
+| Login page | 78 | 94 | 100 | 82 |
 
-The baseline results showed that accessibility was already relatively strong, but performance was weaker. The main issue identified by Lighthouse was the size of the frontend JavaScript bundle. For example, Lighthouse estimated unused JavaScript savings of approximately **1,098 KiB** on the homepage and **1,039 KiB** on the login page.
+The baseline results showed that the main issue was frontend payload size. On the homepage, Lighthouse reported **First Contentful Paint 4.1 s**, **Largest Contentful Paint 5.1 s**, **Total Blocking Time 130 ms**, and about **338 KiB** of unused JavaScript. On the login page, it reported **First Contentful Paint 3.5 s**, **Largest Contentful Paint 4.1 s**, **Total Blocking Time 130 ms**, about **319 KiB** of unused JavaScript, and about **15 KiB** of unused CSS.
 
 ### 6.3 Changes Implemented
 
-To improve sustainability-related performance, the frontend should be optimised to reduce the amount of JavaScript loaded during the initial page load. Suitable implemented changes include:
+One real optimisation was implemented and measured for this report: route-level code splitting in the React router using `React.lazy` and `Suspense`, so large page modules are loaded only when they are needed.
 
-- introducing route-level code splitting for page components
-- reducing unnecessary JavaScript in the initial bundle
-- reducing unused CSS where possible
-- keeping frequently requested room and building endpoints cached
-
-**Important:** this subsection must describe only the changes that were actually implemented in the final submitted version. If additional optimisation work is completed before submission, this paragraph should be updated to reflect the exact changes made.
+This reduced the amount of JavaScript processed during the initial page load. In the production build before the optimisation, Vite generated one main JavaScript bundle of **1,474.14 kB** before gzip (**452.99 kB** gzip). After the optimisation, the largest shared JavaScript chunk dropped to **669.62 kB** before gzip (**222.07 kB** gzip), with additional route-specific chunks loaded separately. The project also already uses Redis-backed caching for frequently requested room and review endpoints, but the measured improvement discussed here came from the new frontend loading strategy.
 
 ### 6.4 After Measurement and Reflection
 
-After implementing the performance improvements, Lighthouse should be run again on the same two pages and the updated results should be reported below.
+After implementing route-level code splitting, Lighthouse was run again on the same two pages:
 
 | Page | Performance Before | Performance After | Accessibility Before | Accessibility After | Best Practices Before | Best Practices After |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Homepage | 46 | **[Fill in]** | 98 | **[Fill in]** | 78 | **[Fill in]** |
-| Login page | 40 | **[Fill in]** | 94 | **[Fill in]** | 78 | **[Fill in]** |
+| Homepage | 70 | 84 | 98 | 98 | 100 | 100 |
+| Login page | 78 | 83 | 94 | 94 | 100 | 100 |
 
-Suggested reflection text after you fill in the real values:
+The after-measurement also showed improved loading metrics. Homepage **First Contentful Paint** improved from **4.1 s** to **2.8 s**, **Largest Contentful Paint** from **5.1 s** to **3.8 s**, **Total Blocking Time** from **130 ms** to **30 ms**, and unused JavaScript fell from about **338 KiB** to about **116 KiB**. On the login page, **First Contentful Paint** improved from **3.5 s** to **2.8 s**, **Largest Contentful Paint** from **4.1 s** to **3.9 s**, **Total Blocking Time** from **130 ms** to **60 ms**, and unused JavaScript fell from about **319 KiB** to about **106 KiB**.
 
-The main improvement came from reducing the amount of frontend code that needed to be processed during the initial page load. After optimisation, the tested pages loaded more efficiently, which improved the performance score and reduced unnecessary resource usage. Accessibility remained strong because the optimisation work focused mainly on bundle size and page delivery rather than changing form semantics or navigation behaviour.
+The main improvement came from reducing the amount of frontend code that had to be downloaded and processed during the initial page load. Accessibility and best-practice scores remained stable because the optimisation targeted delivery and loading behaviour rather than changing form semantics or navigation patterns.
 
 **[Insert Figure 12: Lighthouse baseline screenshot]**  
 **[Insert Figure 13: Lighthouse after-optimisation screenshot]**
 
 **中文参考**
 
-应用的可持续性相关性能使用 **Google Lighthouse** 进行了评估。评估重点放在面向用户的页面上，因为作业要求至少对两个页面提供性能证据，其中包括首页和一个核心功能页面。
+本项目的可持续性相关性能评估使用 **Google Lighthouse 13.0.3** 完成。为保持测量环境一致，测试于 **2026 年 3 月 18 日** 在基于提交版前端代码构建的本地 production preview 上进行。
 
-### 6.1 使用的工具和测试页面
+### 6.1 使用工具与测试页面
 
-以下页面于 **2026 年 3 月 17 日** 进行了测试：
+测试了以下两个页面：
 
-- 首页：`http://ttz3305012.uk/`
-- 登录页：`http://ttz3305012.uk/login`
+- 首页：`http://127.0.0.1:4173/`
+- 登录页：`http://127.0.0.1:4173/login`
 
-之所以选择这些页面，是因为它们是应用的公开入口页面，并且代表了系统中重要的面向用户部分。
+之所以选择这两个页面，是因为它们是系统对外公开的入口页面，也满足作业对至少两个面向用户页面进行测量的要求。
 
 ### 6.2 基线测量
 
-Lighthouse 的基线结果如下：
+优化前的 Lighthouse 基线结果如下：
 
-| 页面 | 性能 | 无障碍 | 最佳实践 | SEO |
+| 页面 | 性能 | 无障碍 | Best Practices | SEO |
 | --- | ---: | ---: | ---: | ---: |
-| 首页 | 46 | 98 | 78 | 83 |
-| 登录页 | 40 | 94 | 78 | 82 |
+| 首页 | 70 | 98 | 100 | 83 |
+| 登录页 | 78 | 94 | 100 | 82 |
 
-基线结果表明，无障碍表现已经相对较好，但性能较弱。Lighthouse 识别出的主要问题是前端 JavaScript 包过大。例如，Lighthouse 估计首页存在约 **1,098 KiB** 的未使用 JavaScript，登录页存在约 **1,039 KiB** 的未使用 JavaScript。
+基线结果表明，主要问题在于前端初始载荷较大。首页的 **First Contentful Paint** 为 **4.1 s**，**Largest Contentful Paint** 为 **5.1 s**，**Total Blocking Time** 为 **130 ms**，并存在约 **338 KiB** 的未使用 JavaScript。登录页的 **First Contentful Paint** 为 **3.5 s**，**Largest Contentful Paint** 为 **4.1 s**，**Total Blocking Time** 为 **130 ms**，约有 **319 KiB** 的未使用 JavaScript，以及约 **15 KiB** 的未使用 CSS。
 
 ### 6.3 已实施的改进
 
-为了提升与可持续性相关的性能，前端应进行优化，以减少初始页面加载时需要加载的 JavaScript 数量。适合写入此处的真实优化包括：
+本报告中实际完成并重新测量的一项优化是：在 React 路由中使用 `React.lazy` 和 `Suspense` 实现按路由代码分割，使大型页面模块仅在需要时加载。
 
-- 对页面组件引入按路由拆分加载
-- 减少初始 bundle 中不必要的 JavaScript
-- 在可能情况下减少未使用 CSS
-- 对常用的房间和建筑接口保持缓存
-
-**重要：** 这一小节只能描述最终提交版本中真实已经做过的改动。如果在提交前你们完成了额外优化，需要把这里更新成真实完成的内容。
+这一改动减少了初始页面加载阶段需要处理的 JavaScript 体积。优化前，Vite 生产构建生成的主 JavaScript 文件大小为 **1,474.14 kB**（gzip 后 **452.99 kB**）；优化后，最大的共享 JavaScript chunk 降至 **669.62 kB**（gzip 后 **222.07 kB**），其余页面代码按路由单独加载。项目本身也已经对常用的房间和评论接口使用了基于 Redis 的缓存，但本节讨论的可测量提升主要来自新的前端加载策略。
 
 ### 6.4 优化后测量与反思
 
-在完成性能优化后，应再次对同样的两个页面运行 Lighthouse，并在下表中报告更新后的结果。
+在实现按路由代码分割之后，对同样两个页面再次运行 Lighthouse，结果如下：
 
-| 页面 | 优化前性能 | 优化后性能 | 优化前无障碍 | 优化后无障碍 | 优化前最佳实践 | 优化后最佳实践 |
+| 页面 | 优化前性能 | 优化后性能 | 优化前无障碍 | 优化后无障碍 | 优化前 Best Practices | 优化后 Best Practices |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 首页 | 46 | **[填写]** | 98 | **[填写]** | 78 | **[填写]** |
-| 登录页 | 40 | **[填写]** | 94 | **[填写]** | 78 | **[填写]** |
+| 首页 | 70 | 84 | 98 | 98 | 100 | 100 |
+| 登录页 | 78 | 83 | 94 | 94 | 100 | 100 |
 
-在填入真实数值后，你可以使用下面这段反思文字：
+优化后的加载指标也有明显提升。首页的 **First Contentful Paint** 从 **4.1 s** 降到 **2.8 s**，**Largest Contentful Paint** 从 **5.1 s** 降到 **3.8 s**，**Total Blocking Time** 从 **130 ms** 降到 **30 ms**，未使用 JavaScript 从约 **338 KiB** 降到约 **116 KiB**。登录页的 **First Contentful Paint** 从 **3.5 s** 降到 **2.8 s**，**Largest Contentful Paint** 从 **4.1 s** 降到 **3.9 s**，**Total Blocking Time** 从 **130 ms** 降到 **60 ms**，未使用 JavaScript 从约 **319 KiB** 降到约 **106 KiB**。
 
-主要改进来自于减少初始页面加载时需要处理的前端代码量。经过优化后，测试页面加载更高效，从而提升了性能分数并减少了不必要的资源消耗。无障碍分数依旧保持较高水平，因为优化工作主要集中在 bundle 大小和页面交付方式上，而不是改变表单语义或导航行为。
+主要提升来自减少初始页面加载时需要下载和处理的前端代码量。由于本次优化针对的是资源传输和加载行为，而不是表单语义或导航方式，因此无障碍和最佳实践分数保持稳定。
 
 **[插入图 12：Lighthouse 基线截图]**  
 **[插入图 13：Lighthouse 优化后截图]**
@@ -804,38 +744,19 @@ Lighthouse 的基线结果如下：
 Declaration on the use of Generative AI:
 
 - We declare that we have used GenAI for copy-editing and improving the clarity of language in the report.
-- We declare that we have used GenAI for limited debugging support, code-quality suggestions, test ideas, and guidance on accessibility and sustainability reporting.
+- We declare that we have used GenAI for limited debugging support, code-quality suggestions, testing ideas, accessibility guidance, sustainability analysis, and small refactoring suggestions.
 
 Tool(s) used: ChatGPT  
-Parts affected: report drafting/editing, report structure, debugging guidance, testing ideas, accessibility guidance, and sustainability interpretation.  
+Parts affected: report drafting and editing, report structure, debugging guidance, testing ideas, accessibility guidance, sustainability interpretation, and limited code-quality suggestions.  
 How correctness was ensured: we checked the final report against the coursework brief, verified the report content against our own codebase, and validated implementation details through builds, tests, and manual review before submission.
 
 **中文参考**
 
 关于生成式 AI 使用的声明：
 
-- 我们声明，我们使用了生成式 AI 来进行报告的语言润色和表达清晰度提升。
-- 我们声明，我们还在有限范围内使用了生成式 AI 来获得调试支持、代码质量建议、测试思路，以及无障碍和可持续性报告方面的指导。
+- 我们声明，我们使用了生成式 AI 对报告进行语言润色，并提升表达的清晰度。
+- 我们声明，我们还在有限范围内使用了生成式 AI 来获得调试支持、代码质量建议、测试思路、无障碍指导、可持续性分析以及小规模重构建议。
 
 使用工具：ChatGPT  
-影响部分：报告撰写 / 编辑、报告结构、调试指导、测试思路、无障碍指导和可持续性分析。  
+影响部分：报告撰写与编辑、报告结构、调试指导、测试思路、无障碍指导、可持续性解释，以及有限的代码质量建议。  
 正确性保证方式：我们将最终报告与 coursework brief 进行对照检查，依据自己的代码库核对报告内容，并通过构建、测试和人工复查来验证实现细节。
-
----
-
-## Final Notes Before Exporting to PDF
-## 导出 PDF 前的最终提醒
-
-**English**
-
-- Replace all figure placeholders with real screenshots or diagrams.
-- Keep the section page limits in mind when transferring this draft into Word.
-- Do not claim any sustainability improvement as implemented unless it was actually implemented and re-measured.
-- If the ER diagram still shows entities not present in the final code, update it before submission.
-
-**中文参考**
-
-- 把所有 Figure 占位符都替换成真实截图或图表。
-- 把这份草稿转进 Word 时，要注意各章节页数限制。
-- 没有真实实现并重新测量的可持续性优化，不要写成“已经完成”。
-- 如果 ER 图里仍然画了最终代码中不存在的实体，请在提交前更新。
