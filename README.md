@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="frontend/public/studynest-mark.png" alt="StudyNest logo" width="120" />
+</p>
+
 # Study Room Booking System (StudyNest Reserve)
 Study Room Booking System is a full-stack web project for campus room booking.
 Students can search rooms, send booking requests, and check their booking history.
