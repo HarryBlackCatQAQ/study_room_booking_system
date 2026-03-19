@@ -21,9 +21,9 @@ DJANGO_ENV = os.getenv("DJANGO_ENV", "development")
 env_file = BASE_DIR / f".env.{DJANGO_ENV}"
 
 if env_file.exists():
-    load_dotenv(env_file)
+    load_dotenv(env_file, override=True)
 else:
-    load_dotenv(BASE_DIR / ".env")
+    load_dotenv(BASE_DIR / ".env", override=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/

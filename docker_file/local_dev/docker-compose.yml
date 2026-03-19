@@ -1,0 +1,111 @@
+services:
+  postgres-primary:
+    image: bitnami/postgresql:latest
+    restart: unless-stopped
+    environment:
+      POSTGRESQL_DATABASE: studyroom
+      POSTGRESQL_USERNAME: studyuser
+      POSTGRESQL_PASSWORD: study123456
+      POSTGRESQL_POSTGRES_PASSWORD: studyroot123456
+      POSTGRESQL_REPLICATION_MODE: master
+      POSTGRESQL_REPLICATION_USER: replicator
+      POSTGRESQL_REPLICATION_PASSWORD: replicator123456
+    ports:
+      - "5012:5432"
+    volumes:
+      - postgres_primary_data:/bitnami/postgresql
+      - ../public_server/postgres/init-primary/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ../../backups/postgres/studyroom_20260317_012351.sql:/docker-entrypoint-initdb.d/02-seed-studyroom.sql:ro
+    networks:
+      - studyroom_local_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U studyuser -d studyroom"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  postgres-replica-1:
+    image: bitnami/postgresql:latest
+    restart: unless-stopped
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    environment:
+      POSTGRESQL_DATABASE: studyroom
+      POSTGRESQL_USERNAME: studyuser
+      POSTGRESQL_PASSWORD: study123456
+      POSTGRESQL_POSTGRES_PASSWORD: studyroot123456
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_MASTER_HOST: postgres-primary
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_REPLICATION_USER: replicator
+      POSTGRESQL_REPLICATION_PASSWORD: replicator123456
+    ports:
+      - "5014:5432"
+    volumes:
+      - postgres_replica_1_data:/bitnami/postgresql
+    networks:
+      - studyroom_local_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U studyuser -d studyroom"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  postgres-replica-2:
+    image: bitnami/postgresql:latest
+    restart: unless-stopped
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    environment:
+      POSTGRESQL_DATABASE: studyroom
+      POSTGRESQL_USERNAME: studyuser
+      POSTGRESQL_PASSWORD: study123456
+      POSTGRESQL_POSTGRES_PASSWORD: studyroot123456
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_MASTER_HOST: postgres-primary
+      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+      POSTGRESQL_REPLICATION_USER: replicator
+      POSTGRESQL_REPLICATION_PASSWORD: replicator123456
+    ports:
+      - "5015:5432"
+    volumes:
+      - postgres_replica_2_data:/bitnami/postgresql
+    networks:
+      - studyroom_local_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U studyuser -d studyroom"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --requirepass
+      - studyredis123456
+      - --appendonly
+      - "yes"
+    ports:
+      - "5013:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - studyroom_local_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "studyredis123456", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  postgres_primary_data:
+  postgres_replica_1_data:
+  postgres_replica_2_data:
+  redis_data:
+
+networks:
+  studyroom_local_net:
